@@ -1,0 +1,35 @@
+project qt-hammer : requirements <toolset>gcc:<cxxflags>"--std=c++11" ;
+ 
+feature.feature all-static : on : propagated composite no-defaults;
+feature.compose <all-static>on : <link>static;
+
+lib hammerplugin 
+  : [ glob ../src/*.cpp ]
+    [ glob ../src/*.h ]
+#    [ qt.uic [ glob ../src/*.ui ] ]
+    ../src/hammerproject.qrc
+    hammerplugin.moc
+    /hammer/core
+    /boost/foreach/<version>1.58.0
+    /boost/serialization/<version>1.58.0
+    /qtcreator/<version>3.4.1
+    /Qt
+  :
+#    <host-os>windows,<variant>debug:<name>HammerPlugind.dll
+#    <host-os>windows,<variant>release:<name>HammerPlugin.dll
+    <host-os>linux,<variant>debug:<name>libHammerd.so
+    <host-os>linux,<variant>release:<name>libHammer.so
+  ;
+
+qt.moc hammerplugin.moc 
+   : 
+    ../src/hammerplugin.h 
+    ../src/hammerprojectmanager.h
+    ../src/hammerproject.h
+#    ../src/hammerprojectnode.h
+    ../src/hammermakestep.h
+    ../src/hammerbuildconfiguration.h
+    ../src/hammerrunconfiguration.h
+    ../src/hammerrunconfigurationwidget.h
+   ;
+explicit hammerplugin.moc ;
