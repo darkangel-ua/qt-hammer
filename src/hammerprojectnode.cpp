@@ -6,6 +6,8 @@
 #include <hammer/core/main_target.h>
 #include <hammer/core/types.h>
 #include <hammer/core/target_type.h>
+#include <hammer/core/feature_set.h>
+#include <hammer/core/feature.h>
 #include <hammer/core/toolsets/qt_toolset.h>
 
 #include "hammerprojectnode.h"
@@ -26,13 +28,26 @@ HammerNodeBase::HammerNodeBase(const Utils::FileName& projectFilePath)
 {
 }
 
+static
+std::string
+versioned_name(const hammer::main_target& mt)
+{
+   const std::string& name = mt.name().to_string();
+   const feature_set& props = mt.properties();
+   auto i = props.find("version");
+   if (i == props.end())
+      return name;
+   else
+      return name + "-" + (**i).value().to_string();
+}
+
 HammerProjectNode::HammerProjectNode(HammerProject* project, 
                                      Core::IDocument* projectFile)
    : HammerNodeBase(projectFile->filePath()),
      m_project(project),
      m_projectFile(projectFile)
 {
-   setDisplayName(QString::fromStdString(project->get_main_target().name().to_string()));
+   setDisplayName(QString::fromStdString(versioned_name(project->get_main_target())));
    refresh();
 }
 
@@ -152,7 +167,7 @@ HammerDepProjectNode::HammerDepProjectNode(const hammer::main_target& mt,
      mt_(mt),
      owner_(owner)
 {
-   setDisplayName(QString::fromStdString(mt.name().to_string()));
+   setDisplayName(QString::fromStdString(versioned_name(mt)));
    refresh();
 }
 
@@ -173,7 +188,7 @@ HammerDepLinkProjectNode::HammerDepLinkProjectNode(HammerDepProjectNode& link)
    : HammerNodeBase(Utils::FileName::fromString(QString::fromStdString(link.mt().location().string() + "/hammer"))),
      link_(link)
 {
-   setDisplayName(QString::fromStdString(link_.mt().name().to_string()));
+   setDisplayName(QString::fromStdString(versioned_name(link_.mt())));
    refresh();
 }
 
