@@ -167,15 +167,6 @@ HammerRunConfiguration::environment() const
 // from projectexplorer/projectconfiguration.cpp
 static const char * const CONFIGURATION_ID_KEY("ProjectExplorer.ProjectConfiguration.Id");
 
-//QVariantMap HammerRunConfiguration::toMap() const
-//{
-//   // there is only one way to make factory works - substitute id
-//   QVariantMap res = QtSupport::CustomExecutableRunConfiguration::toMap();
-//   res[CONFIGURATION_ID_KEY] = QLatin1String(HAMMER_RUN_CONFIGURATION_ID);
-
-//   return res;
-//}
-
 HammerRunConfigurationFactory::HammerRunConfigurationFactory(QObject *parent)
    : ProjectExplorer::IRunConfigurationFactory(parent)
 {
