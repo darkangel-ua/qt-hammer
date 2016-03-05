@@ -10,16 +10,17 @@
 #include <projectexplorer/target.h>
 #include <projectexplorer/projectexplorer.h>
 #include <projectexplorer/gnumakeparser.h>
-#include <coreplugin/variablemanager.h>
+//#include <coreplugin/variablemanager.h>
 #include <utils/stringutils.h>
 #include <utils/qtcassert.h>
 #include <utils/qtcprocess.h>
 #include <QCoreApplication>
 #include <QListWidgetItem>
+#include "hammer_make_step_config_widget.h"
 
 namespace {
    const char * const HAMMER_MS_ID("HammerProjectManager.HammerMakeStep");
-   const char * const HAMMER_MS_DISPLAY_NAME(QT_TRANSLATE_NOOP("HammerProjectManager::Internal::HammerMakeStep", "Make"));
+   const char * const HAMMER_MS_DISPLAY_NAME(QT_TRANSLATE_NOOP("HammerProjectManager::Internal::HammerMakeStep", "Hammer"));
    const char * const HAMMER_MAKE_CURRENT_DISPLAY_NAME(QT_TRANSLATE_NOOP("HammerProjectManager::Internal::HammerMakeCurrentStep", "MakeCurrent"));
 
    const char * const BUILD_TARGETS_KEY("HammerProjectManager.HammerMakeStep.BuildTargets");
@@ -29,13 +30,14 @@ namespace {
 
 namespace hammer{ namespace QtCreator{
 
-HammerMakeStep::HammerMakeStep(ProjectExplorer::BuildStepList *parent) :
+HammerMakeStep::HammerMakeStep(ProjectExplorer::BuildStepList* parent) :
 AbstractProcessStep(parent, Core::Id(HAMMER_MS_ID))
 {
    ctor();
 }
 
-HammerMakeStep::HammerMakeStep(ProjectExplorer::BuildStepList *parent, HammerMakeStep *bs)
+HammerMakeStep::HammerMakeStep(ProjectExplorer::BuildStepList* parent,
+                               HammerMakeStep* bs)
    : AbstractProcessStep(parent, bs),
      m_buildTargets(bs->m_buildTargets),
      m_makeArguments(bs->m_makeArguments),
@@ -47,24 +49,25 @@ HammerMakeStep::HammerMakeStep(ProjectExplorer::BuildStepList *parent, HammerMak
 void HammerMakeStep::ctor()
 {
    setDefaultDisplayName(QCoreApplication::translate("HammerProjectManager::Internal::HammerMakeStep", HAMMER_MS_DISPLAY_NAME));
-   m_makeCommand = "hammer";
+   m_makeCommand = "dhammer";
 }
 
 HammerMakeStep::~HammerMakeStep()
 {
 }
 
-HammerBuildConfiguration *HammerMakeStep::hammerBuildConfiguration() const
+HammerBuildConfiguration*
+HammerMakeStep::hammerBuildConfiguration() const
 {
-   return static_cast<HammerBuildConfiguration *>(buildConfiguration());
+   return static_cast<HammerBuildConfiguration*>(buildConfiguration());
 }
 
 bool HammerMakeStep::init()
 {
-   HammerBuildConfiguration *bc = hammerBuildConfiguration();
+   HammerBuildConfiguration* bc = hammerBuildConfiguration();
 
    setEnabled(true);
-   ProjectExplorer::ProcessParameters *pp = processParameters();
+   ProjectExplorer::ProcessParameters* pp = processParameters();
    pp->setMacroExpander(bc->macroExpander());
    pp->setWorkingDirectory(bc->buildDirectory().toString());
    pp->setEnvironment(bc->environment());
@@ -117,7 +120,7 @@ void HammerMakeStep::run(QFutureInterface<bool> &fi)
 
 ProjectExplorer::BuildStepConfigWidget *HammerMakeStep::createConfigWidget()
 {
-   return new HammerMakeStepConfigWidget(this);
+   return new hammer_make_step_config_widget(this);
 }
 
 bool HammerMakeStep::immutable() const
@@ -277,97 +280,6 @@ QString HammerMakeStepFactory::displayNameForId(Core::Id id) const
       return QCoreApplication::translate("HammerProjectManager::Internal::HammerMakeStep", HAMMER_MS_DISPLAY_NAME);
 
    return QString();
-}
-
-//
-// HammerMakeStepConfigWidget
-//
-
-HammerMakeStepConfigWidget::HammerMakeStepConfigWidget(HammerMakeStep *makeStep)
-    : m_makeStep(makeStep)
-{
-/*
-    m_ui = new Ui::HammerMakeStep;
-    m_ui->setupUi(this);
-
-    // TODO update this list also on rescans of the HammerLists.txt
-    HammerProject *pro = m_makeStep->genericBuildConfiguration()->genericTarget()->genericProject();
-    foreach (const QString &target, pro->buildTargets()) {
-        QListWidgetItem *item = new QListWidgetItem(target, m_ui->targetsList);
-        item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-        item->setCheckState(m_makeStep->buildsTarget(item->text()) ? Qt::Checked : Qt::Unchecked);
-    }
-
-    m_ui->makeLineEdit->setText(m_makeStep->m_makeCommand);
-    m_ui->makeArgumentsLineEdit->setText(m_makeStep->m_makeArguments);
-    updateMakeOverrrideLabel();
-    updateDetails();
-
-    connect(m_ui->targetsList, SIGNAL(itemChanged(QListWidgetItem*)),
-            this, SLOT(itemChanged(QListWidgetItem*)));
-    connect(m_ui->makeLineEdit, SIGNAL(textEdited(QString)),
-            this, SLOT(makeLineEditTextEdited()));
-    connect(m_ui->makeArgumentsLineEdit, SIGNAL(textEdited(QString)),
-            this, SLOT(makeArgumentsLineEditTextEdited()));
-
-    connect(ProjectExplorer::ProjectExplorerPlugin::instance(), SIGNAL(settingsChanged()),
-            this, SLOT(updateMakeOverrrideLabel()));
-    connect(ProjectExplorer::ProjectExplorerPlugin::instance(), SIGNAL(settingsChanged()),
-            this, SLOT(updateDetails()));
-*/
-}
-
-HammerMakeStepConfigWidget::~HammerMakeStepConfigWidget()
-{
-
-}
-
-QString HammerMakeStepConfigWidget::displayName() const
-{
-    return tr("Hammer", "HammerMakestep display name.");
-}
-
-// TODO: Label should update when tool chain is changed
-void HammerMakeStepConfigWidget::updateMakeOverrrideLabel()
-{
-//    m_ui->makeLabel->setText(tr("Override %1:").arg(m_makeStep->makeCommand()));
-}
-
-void HammerMakeStepConfigWidget::updateDetails()
-{
-    HammerBuildConfiguration *bc = m_makeStep->hammerBuildConfiguration();
-
-    ProjectExplorer::ProcessParameters param;
-    param.setMacroExpander(bc->macroExpander());
-    param.setWorkingDirectory(bc->buildDirectory().toString());
-    param.setEnvironment(bc->environment());
-    param.setCommand(m_makeStep->makeCommand());
-    param.setArguments(m_makeStep->allArguments());
-    m_summaryText = param.summary(displayName());
-    emit updateSummary();
-}
-
-QString HammerMakeStepConfigWidget::summaryText() const
-{
-    return m_summaryText;
-}
-
-void HammerMakeStepConfigWidget::itemChanged(QListWidgetItem *item)
-{
-    m_makeStep->setBuildTarget(item->text(), item->checkState() & Qt::Checked);
-    updateDetails();
-}
-
-void HammerMakeStepConfigWidget::makeLineEditTextEdited()
-{
-//    m_makeStep->m_makeCommand = m_ui->makeLineEdit->text();
-    updateDetails();
-}
-
-void HammerMakeStepConfigWidget::makeArgumentsLineEditTextEdited()
-{
-//    m_makeStep->m_makeArguments = m_ui->makeArgumentsLineEdit->text();
-    updateDetails();
 }
 
 }}

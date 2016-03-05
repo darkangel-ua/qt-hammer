@@ -8,13 +8,13 @@ class QListWidgetItem;
 namespace hammer{ namespace QtCreator{
 
 class HammerBuildConfiguration;
-class HammerMakeStepConfigWidget;
+class hammer_make_step_config_widget;
 class HammerMakeStepFactory;
 
 class HammerMakeStep : public ProjectExplorer::AbstractProcessStep
 {
       Q_OBJECT
-      friend class HammerMakeStepConfigWidget; // TODO remove again?
+      friend class hammer_make_step_config_widget;
       friend class HammerMakeStepFactory;
 
    public:
@@ -52,7 +52,7 @@ class HammerMakeStep : public ProjectExplorer::AbstractProcessStep
 class HammerMakeCurrentStep : public ProjectExplorer::AbstractProcessStep
 {
       Q_OBJECT
-      friend class HammerMakeStepConfigWidget; // TODO remove again?
+//      friend class HammerMakeStepConfigWidget; // TODO remove again?
       friend class HammerMakeStepFactory;
 
    public:
@@ -69,28 +69,6 @@ class HammerMakeCurrentStep : public ProjectExplorer::AbstractProcessStep
    
    private:
       QString m_targetToBuild;
-};
-
-class HammerMakeStepConfigWidget :public ProjectExplorer::BuildStepConfigWidget
-{
-      Q_OBJECT
-   public:
-      HammerMakeStepConfigWidget(HammerMakeStep *makeStep);
-      ~HammerMakeStepConfigWidget();
-      virtual QString displayName() const;
-      virtual QString summaryText() const;
-   
-   private slots:
-      void itemChanged(QListWidgetItem*);
-      void makeLineEditTextEdited();
-      void makeArgumentsLineEditTextEdited();
-      void updateMakeOverrrideLabel();
-      void updateDetails();
-
-   private:
-//      Ui::GenericMakeStep *m_ui;
-      HammerMakeStep *m_makeStep;
-      QString m_summaryText;
 };
 
 class HammerMakeStepFactory : public ProjectExplorer::IBuildStepFactory
