@@ -279,14 +279,14 @@ HammerBuildSettingsWidget::HammerBuildSettingsWidget(HammerBuildConfiguration *b
     m_pathChooser->setHistoryCompleter(QLatin1String("Generic.BuildDir.History"));
     m_pathChooser->setEnabled(true);
     fl->addRow(tr("Build directory:"), m_pathChooser);
-    connect(m_pathChooser, &Utils::PathChooser::changed,
-            this, &HammerBuildSettingsWidget::buildDirectoryChanged);
+//    connect(m_pathChooser, &Utils::PathChooser::changed,
+//            this, &HammerBuildSettingsWidget::buildDirectoryChanged);
 
     m_buildConfiguration = bc;
     m_pathChooser->setBaseFileName(bc->target()->project()->projectDirectory());
     m_pathChooser->setEnvironment(bc->environment());
     m_pathChooser->setPath(m_buildConfiguration->rawBuildDirectory().toString());
-    setDisplayName(tr("Generic Manager"));
+    setDisplayName(tr("Hammer"));
 
     connect(bc, &HammerBuildConfiguration::environmentChanged,
             this, &HammerBuildSettingsWidget::environmentHasChanged);

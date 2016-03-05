@@ -107,6 +107,8 @@ QStringList HammerProject::files(FilesMode fileMode) const
    foreach(const hammer::main_target* mt, mts)
       m_files += files_impl(*mt, fileMode);
 
+   m_files += m_projectFile->filePath().toString();
+
    return m_files;
 }
 
@@ -191,10 +193,12 @@ QStringList HammerProject::allDefines(const hammer::main_target& mt) const
    return result;
 }
 
-bool HammerProject::fromMap(const QVariantMap& map)
+ProjectExplorer::Project::RestoreResult
+HammerProject::fromMap(const QVariantMap& map, QString *errorMessage)
 {
-   if (!Project::fromMap(map))
-      return false;
+   RestoreResult r = Project::fromMap(map, errorMessage);
+   if (r != RestoreResult::Ok)
+      return r;
 
    Kit *defaultKit = KitManager::defaultKit();
    if (!activeTarget() && defaultKit)
@@ -211,7 +215,7 @@ bool HammerProject::fromMap(const QVariantMap& map)
 
    refresh();
 
-   return true;
+   return RestoreResult::Ok;
 }
 
 HammerProjectFile::HammerProjectFile(HammerProject* parent,
@@ -220,7 +224,7 @@ HammerProjectFile::HammerProjectFile(HammerProject* parent,
      m_project(parent),
      m_fileName(fileName)
 {
-   setId("Generic.ProjectFile");
+   setId("Hammer.ProjectFile");
    setMimeType(QLatin1String(HAMMERMIMETYPE));
    setFilePath(Utils::FileName::fromString(fileName));
 }

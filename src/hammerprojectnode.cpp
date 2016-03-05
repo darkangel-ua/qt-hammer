@@ -20,11 +20,7 @@ void gatherAllMainTargets(boost::unordered_set<const main_target*>& targets,
                           const main_target& targetToInspect);
 
 HammerNodeBase::HammerNodeBase(const Utils::FileName& projectFilePath)
-   : ProjectExplorer::ProjectNode(projectFilePath),
-     m_srcNode(NULL),
-     m_incNode(NULL),
-     m_resNode(NULL),
-     m_formNode(NULL)
+   : ProjectExplorer::ProjectNode(projectFilePath)
 {
 }
 
@@ -117,6 +113,13 @@ void HammerNodeBase::addNodes(const basic_target* bt)
 void HammerProjectNode::refresh()
 {
    HammerNodeBase::refresh();
+
+   m_buildNode = new FolderNode(Utils::FileName::fromString(QString("build")));
+   addFolderNodes({m_buildNode});
+
+   ProjectExplorer::FileNode* hamfile_node = new ProjectExplorer::FileNode(m_projectFile->filePath(), ProjectExplorer::ProjectFileType, false);
+   m_buildNode->addFileNodes({hamfile_node});
+
    BOOST_FOREACH(const basic_target* bt, m_project->get_main_target().sources())
       addNodes(bt);
 
@@ -179,6 +182,9 @@ HammerDepProjectNode::~HammerDepProjectNode()
 void HammerDepProjectNode::refresh()
 {
    HammerNodeBase::refresh();
+
+//   m_buildNode = new FolderNode(Utils::FileName::fromString(QString("build")));
+//   addFolderNodes({m_buildNode});
 
    BOOST_FOREACH(const basic_target* bt, mt_.sources())
       addNodes(bt);

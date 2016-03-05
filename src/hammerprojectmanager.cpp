@@ -7,6 +7,7 @@
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
 #include <boost/unordered_set.hpp>
+#include <boost/filesystem/operations.hpp>
 
 #include <hammer/core/toolset_manager.h>
 #include <hammer/core/toolsets/gcc_toolset.h>
@@ -34,6 +35,7 @@
 #include "hammerprojectconstants.h"
 
 using namespace std;
+namespace fs = boost::filesystem;
 
 namespace hammer{ namespace QtCreator{
 
@@ -47,12 +49,48 @@ void use_toolset_rule(project*, engine& e, pstring& toolset_name, pstring& tools
    e.toolset_manager().init_toolset(e, toolset_name.to_string(), toolset_version.to_string(), toolset_home_ == NULL ? NULL : &toolset_home);
 }
 
+static
+fs::path get_data_path()
+{
+   fs::path local_path("/usr/local/lib/hammer");
+   if (fs::exists(local_path))
+      return local_path;
+   else
+      return "/usr/lib/hammer";
+}
+
+static
+hammer::location_t
+get_user_config_location()
+{
+#if defined(_WIN32)
+   const char* home_path = getenv("USERPROFILE");
+   if (home_path != NULL)
+      return hammer::location_t(home_path) / "user-config.ham";
+   else
+      throw std::runtime_error("Can't find user home directory.");
+
+#else
+#   if defined(__linux__)
+
+   const char* home_path = getenv("HOME");
+   if (home_path != NULL)
+      return hammer::location_t(home_path) / "user-config.ham";
+   else
+      throw std::runtime_error("Can't find user home directory.");
+
+#   else
+#      error "Platform not supported"
+#   endif
+#endif
+}
+
 ProjectManager::ProjectManager()
 {
 #if defined(_WIN32)
    m_engine.load_hammer_script("D:\\bin\\hammer\\scripts\\startup.ham");
 #else
-   m_engine.load_hammer_script("/usr/lib/hammer/scripts/startup.ham");
+   m_engine.load_hammer_script(get_data_path() / "scripts/startup.ham");
 #endif
    types::register_standart_types(m_engine.get_type_registry(), m_engine.feature_registry());
    m_engine.generators().insert(std::auto_ptr<generator>(new copy_generator(m_engine)));
@@ -70,6 +108,10 @@ ProjectManager::ProjectManager()
    m_engine.toolset_manager().add_toolset(auto_ptr<toolset>(new qt_toolset));
 
    m_engine.call_resolver().insert("use-toolset", boost::function<void (project*, pstring&, pstring&, pstring*)>(boost::bind(use_toolset_rule, _1, boost::ref(m_engine), _2, _3, _4)));
+   hammer::location_t user_config_script = get_user_config_location();
+   if (!user_config_script.empty() && exists(user_config_script))
+      m_engine.load_hammer_script(user_config_script);
+
    m_engine.toolset_manager().autoconfigure(m_engine);
 }
 
