@@ -28,10 +28,11 @@ class HammerNodeBase : public ProjectExplorer::ProjectNode
       void addNodes(const basic_target* bt);
       virtual void refresh();
 
-      FolderNode* m_srcNode;
-      FolderNode* m_incNode;
-      FolderNode* m_resNode;
-      FolderNode* m_formNode;
+      FolderNode* m_srcNode = nullptr;
+      FolderNode* m_incNode = nullptr;
+      FolderNode* m_resNode = nullptr;
+      FolderNode* m_formNode = nullptr;
+      FolderNode* m_buildNode = nullptr;
 };
 
 class HammerProjectNode : public HammerNodeBase

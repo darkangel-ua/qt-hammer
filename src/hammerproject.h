@@ -39,7 +39,7 @@ class HammerProject : public ProjectExplorer::Project
       void toolChainChanged(ProjectExplorer::ToolChain *);
 
    protected:
-      bool fromMap(const QVariantMap &map) override;
+      virtual RestoreResult fromMap(const QVariantMap &map, QString *errorMessage) override;
    
    private:
       ProjectManager *m_manager;
