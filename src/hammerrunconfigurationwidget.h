@@ -25,24 +25,19 @@ class HammerRunConfigurationWidget : public QWidget
       Q_OBJECT
 
    public:
-      enum ApplyMode { InstantApply, DelayedApply};
-      HammerRunConfigurationWidget(HammerRunConfiguration* rc, ApplyMode mode);
-      void apply(); // only used for DelayedApply
+      HammerRunConfigurationWidget(HammerRunConfiguration* rc);
 
    private slots:
-      void changed();
+       void setWorkingDirectory();
+       void resetWorkingDirectory();
+       void environmentWasChanged();
 
-      void argumentsEdited(const QString &arguments);
-      void workingDirectoryEdited();
-      void termToggled(bool);
-      void environmentWasChanged();
+       void workingDirectoryChanged(const QString &workingDirectory);
 
    private:
       bool m_ignoreChange;
       HammerRunConfiguration* m_runConfiguration;
-      QLineEdit *m_commandLineArgumentsLineEdit;
       Utils::PathChooser *m_workingDirectory;
-      QCheckBox *m_useTerminalCheck;
       Utils::DetailsWidget *m_detailsContainer;
 };
 

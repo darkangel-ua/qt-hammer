@@ -23,7 +23,7 @@ class HammerRunConfiguration : public ProjectExplorer::LocalApplicationRunConfig
       ConfigurationState ensureConfigured(QString *errorMessage = 0) override { return Configured; }
 
    signals:
-       void changed();
+       void baseWorkingDirectoryChanged(const QString&);
 
    protected:
       HammerRunConfiguration(ProjectExplorer::Target* parent,
@@ -37,11 +37,6 @@ class HammerRunConfiguration : public ProjectExplorer::LocalApplicationRunConfig
       mutable boost::optional<QStringList> m_additionalPaths;
 
       QString m_workingDirectory;
-      QString m_cmdArguments;
-      ProjectExplorer::ApplicationLauncher::Mode m_runMode;
-      void setCommandLineArguments(const QString& commandLineArguments);
-      QString rawCommandLineArguments() const;
-      void setRunMode(ProjectExplorer::ApplicationLauncher::Mode runMode);
       void setBaseWorkingDirectory(const QString& workingDirectory);
       QString baseWorkingDirectory() const;
 };
