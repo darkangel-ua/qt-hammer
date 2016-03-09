@@ -1,5 +1,6 @@
 #include <projectexplorer/target.h>
 #include <projectexplorer/localenvironmentaspect.h>
+#include <projectexplorer/runconfigurationaspects.h>
 
 #include <hammer/core/main_target.h>
 #include <hammer/core/collect_nodes.h>
@@ -11,9 +12,11 @@
 #include "hammerrunconfigurationwidget.h"
 #include "hammerproject.h"
 
-static const char* const HAMMER_RUN_CONFIGURATION_ID = "HammerPlugin.RunConfiguration";
+static const char* const HAMMER_RUN_CONFIGURATION_ID = "HummerProjectManager.HammerRunConfiguration";
 static const char* const COMMAND_ARGUMENTS_KEY = "HummerProjectManager.HummerRunConfiguration.CommandArguments";
 static const char* const WORKING_DIRECTORY_KEY = "HummerProjectManager.HummerRunConfiguration.WorkingDirectory";
+
+using namespace ProjectExplorer;
 
 namespace hammer{ namespace QtCreator{
 
@@ -21,7 +24,9 @@ HammerRunConfiguration::HammerRunConfiguration(ProjectExplorer::Target* parent)
    : LocalApplicationRunConfiguration(parent, Core::Id(HAMMER_RUN_CONFIGURATION_ID)),
      m_target(parent)
 {
-   addExtraAspect(new ProjectExplorer::LocalEnvironmentAspect(this));
+   addExtraAspect(new LocalEnvironmentAspect(this));
+   addExtraAspect(new ArgumentsAspect(this, QStringLiteral("HammerProjectManager.HammerRunConfiguration.Arguments")));
+   addExtraAspect(new TerminalAspect(this, QStringLiteral("HammerProjectManager.HammerRunConfiguration.UseTerminal")));
    setDefaultDisplayName("Hammer Run");
 }
 
@@ -46,6 +51,13 @@ QString HammerRunConfiguration::executable() const
                location_t l = bt->location() / bt->name().to_string();
                m_executable = QString::fromStdString(l.string());
                return *m_executable;
+            } else if (bt->type().equal_or_derived_from(types::TESTING_OUTPUT)) {
+               for (const build_node::source_t& src : node->sources_)
+                  if (src.source_target_->type().equal_or_derived_from(types::EXE)) {
+                     location_t l = src.source_target_->location() / src.source_target_->name().to_string();
+                     m_executable = QString::fromStdString(l.string());
+                     return *m_executable;
+                  }
             }
    } catch(...) { }
 
@@ -55,7 +67,7 @@ QString HammerRunConfiguration::executable() const
 ProjectExplorer::ApplicationLauncher::Mode
 HammerRunConfiguration::runMode() const
 {
-   return ProjectExplorer::ApplicationLauncher::Console;
+   return extraAspect<TerminalAspect>()->runMode();
 }
 
 QString HammerRunConfiguration::workingDirectory() const
@@ -65,35 +77,18 @@ QString HammerRunConfiguration::workingDirectory() const
 
 QString HammerRunConfiguration::commandLineArguments() const
 {
-   return m_cmdArguments;
+   return extraAspect<ArgumentsAspect>()->arguments();
 }
 
 QWidget* HammerRunConfiguration::createConfigurationWidget()
 {
-   return new HammerRunConfigurationWidget(this, HammerRunConfigurationWidget::InstantApply);
-}
-
-void HammerRunConfiguration::setRunMode(ProjectExplorer::ApplicationLauncher::Mode runMode)
-{
-    m_runMode = runMode;
-    emit changed();
-}
-
-void HammerRunConfiguration::setCommandLineArguments(const QString& commandLineArguments)
-{
-    m_cmdArguments = commandLineArguments;
-    emit changed();
+   return new HammerRunConfigurationWidget(this);
 }
 
 void HammerRunConfiguration::setBaseWorkingDirectory(const QString& workingDirectory)
 {
     m_workingDirectory = workingDirectory;
-    emit changed();
-}
-
-QString HammerRunConfiguration::rawCommandLineArguments() const
-{
-    return m_cmdArguments;
+    emit baseWorkingDirectoryChanged(m_workingDirectory);
 }
 
 QString HammerRunConfiguration::baseWorkingDirectory() const
@@ -103,7 +98,6 @@ QString HammerRunConfiguration::baseWorkingDirectory() const
 
 bool HammerRunConfiguration::fromMap(const QVariantMap &map)
 {
-   m_cmdArguments = map.value(COMMAND_ARGUMENTS_KEY).toString();
    m_workingDirectory = map.value(WORKING_DIRECTORY_KEY).toString();
 
    return ProjectExplorer::LocalApplicationRunConfiguration::fromMap(map);
@@ -113,7 +107,6 @@ QVariantMap HammerRunConfiguration::toMap() const
 {
    QVariantMap result(ProjectExplorer::LocalApplicationRunConfiguration::toMap());
 
-   result.insert(COMMAND_ARGUMENTS_KEY, m_cmdArguments);
    result.insert(WORKING_DIRECTORY_KEY, m_workingDirectory);
 
    return result;
