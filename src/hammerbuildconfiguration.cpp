@@ -19,7 +19,7 @@
 #include <QFormLayout>
 #include <QInputDialog>
 
-using ProjectExplorer::BuildConfiguration;
+using namespace ProjectExplorer;
 
 namespace hammer{ namespace QtCreator{
 
@@ -42,13 +42,8 @@ HammerBuildConfiguration::~HammerBuildConfiguration()
 ProjectExplorer::NamedWidget*
 HammerBuildConfiguration::createConfigWidget()
 {
-   return new HammerBuildSettingsWidget(this);
+   return nullptr;
 }
-
-//HammerTarget *HammerBuildConfiguration::hammerTarget() const
-//{
-//    return static_cast<HammerTarget *>(target());
-//}
 
 HammerBuildConfigurationFactory::HammerBuildConfigurationFactory(QObject *parent) :
     ProjectExplorer::IBuildConfigurationFactory(parent)
@@ -59,40 +54,47 @@ HammerBuildConfigurationFactory::~HammerBuildConfigurationFactory()
 {
 }
 
-//bool HammerBuildConfigurationFactory::canCreate(ProjectExplorer::Target *parent, const QString &id) const
-//{
-//    if (!qobject_cast<HammerTarget *>(parent))
-//        return false;
-    
-//    if (id == QLatin1String(HAMMER_BC_ID))
-//        return true;
-    
-//    return false;
-//}
-
-ProjectExplorer::BuildInfo*
+QList<ProjectExplorer::BuildInfo*>
 HammerBuildConfigurationFactory::createBuildInfo(const ProjectExplorer::Kit* k,
                                                  const Utils::FileName& buildDir) const
 {
-    ProjectExplorer::BuildInfo *info = new ProjectExplorer::BuildInfo(this);
-    info->typeName = tr("Build");
-    info->buildDirectory = buildDir;
-    info->kitId = k->id();
-    return info;
+   QList<ProjectExplorer::BuildInfo *> result;
+
+   ProjectExplorer::BuildInfo* debug_info = new ProjectExplorer::BuildInfo(this);
+   debug_info->typeName = tr("Debug");
+   debug_info->displayName = tr("Debug");
+   debug_info->buildDirectory = buildDir;
+   debug_info->kitId = k->id();
+   debug_info->buildType = BuildConfiguration::Debug;
+
+   ProjectExplorer::BuildInfo* release_info = new ProjectExplorer::BuildInfo(this);
+   release_info->typeName = tr("Release");
+   release_info->displayName = tr("Release");
+   release_info->buildDirectory = buildDir;
+   release_info->kitId = k->id();
+   release_info->buildType = BuildConfiguration::Release;
+
+   ProjectExplorer::BuildInfo* profile_info = new ProjectExplorer::BuildInfo(this);
+   profile_info->typeName = tr("Profile");
+   profile_info->displayName = tr("Profile");
+   profile_info->buildDirectory = buildDir;
+   profile_info->kitId = k->id();
+   profile_info->buildType = BuildConfiguration::Release;
+
+   result << debug_info << release_info << profile_info;
+
+   return result;
 }
 
 int HammerBuildConfigurationFactory::priority(const ProjectExplorer::Target *parent) const
 {
-    return canHandle(parent) ? 0 : -1;
+   return canHandle(parent) ? 0 : -1;
 }
 
 QList<ProjectExplorer::BuildInfo*>
-HammerBuildConfigurationFactory::availableBuilds(const ProjectExplorer::Target *parent) const
+HammerBuildConfigurationFactory::availableBuilds(const ProjectExplorer::Target* parent) const
 {
-    QList<ProjectExplorer::BuildInfo *> result;
-    ProjectExplorer::BuildInfo *info = createBuildInfo(parent->kit(), parent->project()->projectDirectory());
-    result << info;
-    return result;
+   return createBuildInfo(parent->kit(), parent->project()->projectDirectory());
 }
 
 int HammerBuildConfigurationFactory::priority(const ProjectExplorer::Kit *k,
@@ -108,12 +110,7 @@ QList<ProjectExplorer::BuildInfo*>
 HammerBuildConfigurationFactory::availableSetups(const ProjectExplorer::Kit* k,
                                                  const QString& projectPath) const
 {
-    QList<ProjectExplorer::BuildInfo*> result;
-    ProjectExplorer::BuildInfo *info = createBuildInfo(k, ProjectExplorer::Project::projectDirectory(Utils::FileName::fromString(projectPath)));
-    //: The name of the build configuration created by default for a generic project.
-    info->displayName = tr("Default");
-    result << info;
-    return result;
+   return createBuildInfo(k, Utils::FileName::fromString(QDir(projectPath).path()));
 }
 
 HammerBuildConfiguration*
@@ -127,7 +124,8 @@ HammerBuildConfigurationFactory::create(ProjectExplorer::Target* parent,
    HammerBuildConfiguration *bc = new HammerBuildConfiguration(parent);
    bc->setDisplayName(info->displayName);
    bc->setDefaultDisplayName(info->displayName);
-   bc->setBuildDirectory(info->buildDirectory);
+//   bc->setBuildDirectory(info->buildDirectory);
+   bc->build_type_ = info->buildType;
 
    ProjectExplorer::BuildStepList *buildSteps = bc->stepList(ProjectExplorer::Constants::BUILDSTEPS_BUILD);
 //   ProjectExplorer::BuildStepList *cleanSteps = bc->stepList(ProjectExplorer::Constants::BUILDSTEPS_CLEAN);
@@ -135,86 +133,40 @@ HammerBuildConfigurationFactory::create(ProjectExplorer::Target* parent,
    Q_ASSERT(buildSteps);
    HammerMakeStep *makeStep = new HammerMakeStep(buildSteps);
    buildSteps->insertStep(0, makeStep);
-   makeStep->setBuildTarget(QLatin1String("all"), /* on = */ true);
+
+   switch(bc->build_type_) {
+      case BuildConfiguration::Debug:
+         makeStep->set_arguments(QLatin1String("variant=debug"));
+         break;
+
+      case BuildConfiguration::Release:
+         makeStep->set_arguments(QLatin1String("variant=release"));
+         break;
+
+      case BuildConfiguration::Profile:
+         makeStep->set_arguments(QLatin1String("variant=profile"));
+         break;
+
+      default:
+         Q_ASSERT(false);
+         return nullptr;
+   }
 
 //   Q_ASSERT(cleanSteps);
-//   HammerMakeStep *cleanMakeStep = new HammerMakeStep(cleanSteps);
+//   HammerMakeStep* cleanMakeStep = new HammerMakeStep(cleanSteps);
 //   cleanSteps->insertStep(0, cleanMakeStep);
 //   cleanMakeStep->setBuildTarget(QLatin1String("clean"), /* on = */ true);
 //   cleanMakeStep->setClean(true);
 
    return bc;
-
-//   HammerTarget *target(static_cast<HammerTarget *>(parent));
-
-//    //TODO asking for name is duplicated everywhere, but maybe more
-//    // wizards will show up, that incorporate choosing the name
-//    bool ok;
-//    QString buildConfigurationName = QInputDialog::getText(0,
-//                          tr("New Configuration"),
-//                          tr("New configuration name:"),
-//                          QLineEdit::Normal,
-//                          QString(),
-//                          &ok);
-//    if (!ok || buildConfigurationName.isEmpty())
-//        return NULL;
-
-//    HammerBuildConfiguration *bc = new HammerBuildConfiguration(target);
-//    // we need to add current file build list, and toMap/fromMap is only the way for now
-//    QVariantMap saved_bc = bc->toMap();
-//    bc->fromMap(saved_bc);
-
-//    {
-//       ProjectExplorer::BuildStepList *buildSteps = bc->stepList(ProjectExplorer::Constants::BUILDSTEPS_BUILD);
-//       Q_ASSERT(buildSteps);
-//       HammerMakeStep *makeStep = new HammerMakeStep(buildSteps);
-//       buildSteps->insertStep(0, makeStep);
-//       makeStep->setBuildTarget("all", /*on=*/true);
-
-//       target->addBuildConfiguration(bc);
-//    }
-
-//    {
-//       ProjectExplorer::BuildStepList *buildSteps = bc->stepList(HAMMER_BC_BUILD_CURRENT_LIST_ID);
-//       Q_ASSERT(buildSteps);
-//       HammerMakeCurrentStep *makeStep = new HammerMakeCurrentStep(buildSteps);
-//       buildSteps->insertStep(0, makeStep);
-//       target->addBuildConfiguration(bc);
-//    }
-
-//    return bc;
 }
 
 // from QtCreator projectexplorer/buildconfiguration.cpp
 static const char* const BUILD_STEP_LIST_COUNT("ProjectExplorer.BuildConfiguration.BuildStepListCount");
 static const char* const BUILD_STEP_LIST_PREFIX("ProjectExplorer.BuildConfiguration.BuildStepList.");
 
-//QVariantMap HammerBuildConfiguration::toMap() const
-//{
-//   QVariantMap result = BuildConfiguration::toMap();
-
-//   // we need to add current file build step coz there is no other way to do except toMap/fromMap
-//   if (stepList(HAMMER_BC_BUILD_CURRENT_LIST_ID) == NULL)
-//   {
-//      result[BUILD_STEP_LIST_COUNT] = result[BUILD_STEP_LIST_COUNT].toInt() + 1;
-//      ProjectExplorer::BuildStepList* bsl = new ProjectExplorer::BuildStepList(const_cast<HammerBuildConfiguration*>(this), HAMMER_BC_BUILD_CURRENT_LIST_ID);
-//      result[QString(BUILD_STEP_LIST_PREFIX) + QString::number(result[BUILD_STEP_LIST_COUNT].toInt() - 1)] = bsl->toMap();
-//      delete bsl;
-//   }
-
-//   return result;
-//}
-
-//bool HammerBuildConfiguration::fromMap(const QVariantMap &map)
-//{
-//   return ProjectExplorer::BuildConfiguration::fromMap(map);
-//}
-
 bool HammerBuildConfigurationFactory::canHandle(const ProjectExplorer::Target* t) const
 {
-   if (!t->project()->supportsKit(t->kit()))
-        return false;
-
     return qobject_cast<HammerProject*>(t->project());
 }
 
@@ -262,11 +214,13 @@ HammerBuildConfigurationFactory::restore(ProjectExplorer::Target* parent,
    return 0;
 }
 
-BuildConfiguration::BuildType HammerBuildConfiguration::buildType() const
+BuildConfiguration::BuildType
+HammerBuildConfiguration::buildType() const
 {
-    return Unknown;
+    return build_type_;
 }
 
+/*
 HammerBuildSettingsWidget::HammerBuildSettingsWidget(HammerBuildConfiguration *bc)
     : m_buildConfiguration(0)
 {
@@ -301,5 +255,6 @@ void HammerBuildSettingsWidget::environmentHasChanged()
 {
     m_pathChooser->setEnvironment(m_buildConfiguration->environment());
 }
+*/
 
 }}

@@ -27,16 +27,13 @@ class HammerBuildConfiguration : public ProjectExplorer::BuildConfiguration
       ~HammerBuildConfiguration();
       ProjectExplorer::NamedWidget *createConfigWidget() override;
 
-//      HammerTarget *hammerTarget() const;
-
-//      QVariantMap toMap() const override;
-
-      BuildType buildType() const;
-//      virtual bool fromMap(const QVariantMap &map);
+      BuildType buildType() const override;
 
    protected:
       HammerBuildConfiguration(ProjectExplorer::Target* parent,
                                HammerBuildConfiguration* source);
+
+      BuildType build_type_ = BuildType::Debug;
 };
 
 class HammerBuildConfigurationFactory : public ProjectExplorer::IBuildConfigurationFactory
@@ -65,10 +62,13 @@ class HammerBuildConfigurationFactory : public ProjectExplorer::IBuildConfigurat
                                         const QVariantMap &map) override;
    private:
       bool canHandle(const ProjectExplorer::Target *t) const;
-      ProjectExplorer::BuildInfo* createBuildInfo(const ProjectExplorer::Kit* k,
-                                                  const Utils::FileName& buildDir) const;
+
+      QList<ProjectExplorer::BuildInfo*>
+      createBuildInfo(const ProjectExplorer::Kit* k,
+                      const Utils::FileName& buildDir) const;
 };
 
+/*
 class HammerBuildSettingsWidget : public ProjectExplorer::NamedWidget
 {
     Q_OBJECT
@@ -84,6 +84,7 @@ private:
     Utils::PathChooser *m_pathChooser;
     HammerBuildConfiguration *m_buildConfiguration;
 };
+*/
 
 }} 
 
