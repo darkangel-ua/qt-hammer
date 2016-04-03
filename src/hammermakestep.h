@@ -29,8 +29,7 @@ class HammerMakeStep : public ProjectExplorer::AbstractProcessStep
 
       ProjectExplorer::BuildStepConfigWidget *createConfigWidget() override;
       bool immutable() const override;
-      bool buildsTarget(const QString &target) const;
-      void setBuildTarget(const QString &target, bool on);
+      void set_arguments(const QString& args);
       QString allArguments() const;
       QString makeCommand() const;
 
@@ -38,13 +37,11 @@ class HammerMakeStep : public ProjectExplorer::AbstractProcessStep
 
    protected:
       HammerMakeStep(ProjectExplorer::BuildStepList *parent, HammerMakeStep *bs);
-//      HammerMakeStep(ProjectExplorer::BuildStepList *parent, const QString &id);
       bool fromMap(const QVariantMap &map) override;
 
    private:
       void ctor();
 
-      QStringList m_buildTargets;
       QString m_makeArguments;
       QString m_makeCommand;
 };

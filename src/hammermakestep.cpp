@@ -23,7 +23,6 @@ namespace {
    const char * const HAMMER_MS_DISPLAY_NAME(QT_TRANSLATE_NOOP("HammerProjectManager::Internal::HammerMakeStep", "Hammer"));
    const char * const HAMMER_MAKE_CURRENT_DISPLAY_NAME(QT_TRANSLATE_NOOP("HammerProjectManager::Internal::HammerMakeCurrentStep", "MakeCurrent"));
 
-   const char * const BUILD_TARGETS_KEY("HammerProjectManager.HammerMakeStep.BuildTargets");
    const char * const MAKE_ARGUMENTS_KEY("HammerProjectManager.HammerMakeStep.MakeArguments");
    const char * const MAKE_COMMAND_KEY("HammerProjectManager.HammerMakeStep.MakeCommand");
 }
@@ -39,7 +38,6 @@ AbstractProcessStep(parent, Core::Id(HAMMER_MS_ID))
 HammerMakeStep::HammerMakeStep(ProjectExplorer::BuildStepList* parent,
                                HammerMakeStep* bs)
    : AbstractProcessStep(parent, bs),
-     m_buildTargets(bs->m_buildTargets),
      m_makeArguments(bs->m_makeArguments),
      m_makeCommand(bs->m_makeCommand)
 {
@@ -86,7 +84,6 @@ QVariantMap HammerMakeStep::toMap() const
 {
    QVariantMap map(AbstractProcessStep::toMap());
 
-   map.insert(QLatin1String(BUILD_TARGETS_KEY), m_buildTargets);
    map.insert(QLatin1String(MAKE_ARGUMENTS_KEY), m_makeArguments);
    map.insert(QLatin1String(MAKE_COMMAND_KEY), m_makeCommand);
    return map;
@@ -94,7 +91,6 @@ QVariantMap HammerMakeStep::toMap() const
 
 bool HammerMakeStep::fromMap(const QVariantMap &map)
 {
-   m_buildTargets = map.value(QLatin1String(BUILD_TARGETS_KEY)).toStringList();
    m_makeArguments = map.value(QLatin1String(MAKE_ARGUMENTS_KEY)).toString();
    m_makeCommand = map.value(QLatin1String(MAKE_COMMAND_KEY)).toString();
 
@@ -104,7 +100,6 @@ bool HammerMakeStep::fromMap(const QVariantMap &map)
 QString HammerMakeStep::allArguments() const
 {
    QString args = m_makeArguments;
-   Utils::QtcProcess::addArgs(&args, m_buildTargets);
    return args;
 }
 
@@ -128,20 +123,9 @@ bool HammerMakeStep::immutable() const
    return false;
 }
 
-bool HammerMakeStep::buildsTarget(const QString &target) const
+void HammerMakeStep::set_arguments(const QString& args)
 {
-   return m_buildTargets.contains(target);
-}
-
-void HammerMakeStep::setBuildTarget(const QString &target, bool on)
-{
-   QStringList old = m_buildTargets;
-   if (on && !old.contains(target))
-      old << target;
-   else if(!on && old.contains(target))
-      old.removeOne(target);
-
-   m_buildTargets = old;
+   m_makeArguments = args;
 }
 
 HammerMakeCurrentStep::HammerMakeCurrentStep(ProjectExplorer::BuildStepList *parent)
