@@ -169,7 +169,10 @@ QList<Core::Id>
 HammerRunConfigurationFactory::availableCreationIds(ProjectExplorer::Target* parent,
                                                     CreationMode mode) const
 {
-   return { HAMMER_RUN_CONFIGURATION_ID };
+   if (qobject_cast<HammerProject*>(parent->project()))
+      return { HAMMER_RUN_CONFIGURATION_ID };
+   else
+      return {};
 }
 
 QString HammerRunConfigurationFactory::displayNameForId(Core::Id id) const
@@ -180,7 +183,7 @@ QString HammerRunConfigurationFactory::displayNameForId(Core::Id id) const
 bool HammerRunConfigurationFactory::canCreate(ProjectExplorer::Target* parent,
                                               Core::Id id) const
 {
-   return id == Core::Id(HAMMER_RUN_CONFIGURATION_ID);
+   return qobject_cast<HammerProject*>(parent->project()) && id == Core::Id(HAMMER_RUN_CONFIGURATION_ID);
 }
 
 bool HammerRunConfigurationFactory::canRestore(ProjectExplorer::Target* parent,
@@ -200,7 +203,7 @@ HammerRunConfigurationFactory::clone(ProjectExplorer::Target *parent,
                                      ProjectExplorer::RunConfiguration *source)
 {
    if (!canClone(parent, source))
-       return NULL;
+       return nullptr;
 
    return new HammerRunConfiguration(parent, static_cast<HammerRunConfiguration*>(source));
 }
