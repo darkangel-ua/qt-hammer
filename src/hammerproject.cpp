@@ -205,12 +205,9 @@ HammerProject::fromMap(const QVariantMap& map, QString *errorMessage)
       addTarget(createTarget(defaultKit));
 
    QList<Target*> targetList = targets();
-   for(Target* t : targetList) {
+   for (Target* t : targetList) {
       if (!t->buildConfigurations().empty())
          continue;
-
-//      if (!t->activeRunConfiguration())
-//         t->addRunConfiguration(new HammerRunConfiguration(t));
    }
 
    refresh();
