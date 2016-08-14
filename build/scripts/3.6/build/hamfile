@@ -1,0 +1,69 @@
+project qtcreator : requirements
+                      <version>3.6.0
+                      @<include>../src/libs
+                  ;
+
+prebuilt-lib Qt.QtCreator.ExtensionSystem
+ : 
+ :
+  ../lib/qtcreator/libExtensionSystem.so
+ ;
+
+prebuilt-lib Qt.QtCreator.Aggregation
+ : 
+ :
+  ../lib/qtcreator/libAggregation.so
+ ;
+
+prebuilt-lib Qt.QtCreator.Utils
+ : 
+ :
+  ../lib/qtcreator/libUtils.so
+ ;
+
+prebuilt-lib Qt.QtCreator.CppTools
+ : 
+ :
+  ../lib/qtcreator/plugins/libCppTools.so
+ ;
+
+prebuilt-lib Qt.QtCreator.QtSupport
+ : 
+ :
+  ../lib/qtcreator/plugins/libQtSupport.so
+ ;
+
+prebuilt-lib Qt.QtCreator.CorePlugin
+ : 
+ :
+  ../lib/qtcreator/plugins/libCore.so
+ :
+  @<include>../src/plugins
+  @<include>../src/plugins/coreplugin
+ ;
+
+prebuilt-lib Qt.QtCreator.CPlusPlus
+ : 
+ :
+  ../lib/qtcreator/libCPlusPlus.so
+ :
+  @<include>../src/libs/3rdparty
+ ;
+
+prebuilt-lib Qt.QtCreator.ProjectExplorer
+ : 
+ :
+  ../lib/qtcreator/plugins/libProjectExplorer.so
+ :
+  @<include>../src/plugins
+ ;
+
+prebuilt-lib Qt.QtCreator.TextEditor
+ : 
+ :
+  ../lib/qtcreator/plugins/Nokia/libTextEditor.so
+ :
+  @<include>../src/plugins
+ ;
+
+explicit Qt.QtCreator.TextEditor ;
