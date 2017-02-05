@@ -13,6 +13,8 @@
 #include <hammer/core/toolsets/gcc_toolset.h>
 #include <hammer/core/toolsets/msvc_toolset.h>
 #include <hammer/core/toolsets/qt_toolset.h>
+#include <hammer/core/htmpl/htmpl.h>
+#include <hammer/core/warehouse.h>
 #include <hammer/core/types.h>
 #include <hammer/core/generator_registry.h>
 #include <hammer/core/copy_generator.h>
@@ -25,6 +27,8 @@
 #include <hammer/core/main_target.h>
 #include <hammer/core/target_type.h>
 #include <hammer/core/fs_helpers.h>
+#include <hammer/core/feature.h>
+#include <hammer/core/subfeature.h>
 
 #include <QFileInfo>
 #include <QAction>
@@ -47,16 +51,6 @@ void use_toolset_rule(project*, engine& e, pstring& toolset_name, pstring& tools
       toolset_home = toolset_home_->to_string();
 
    e.toolset_manager().init_toolset(e, toolset_name.to_string(), toolset_version.to_string(), toolset_home_ == NULL ? NULL : &toolset_home);
-}
-
-static
-fs::path get_data_path()
-{
-   fs::path local_path("/usr/local/lib/hammer");
-   if (fs::exists(local_path))
-      return local_path;
-   else
-      return "/usr/lib/hammer";
 }
 
 static
@@ -87,16 +81,13 @@ get_user_config_location()
 
 ProjectManager::ProjectManager()
 {
-#if defined(_WIN32)
-   m_engine.load_hammer_script("D:\\bin\\hammer\\scripts\\startup.ham");
-#else
-   m_engine.load_hammer_script(get_data_path() / "scripts/startup.ham");
-#endif
+   install_warehouse_rules(m_engine.call_resolver(), m_engine);
    types::register_standart_types(m_engine.get_type_registry(), m_engine.feature_registry());
    m_engine.generators().insert(std::auto_ptr<generator>(new copy_generator(m_engine)));
    m_engine.generators().insert(std::auto_ptr<generator>(new obj_generator(m_engine)));
    add_testing_generators(m_engine, m_engine.generators());
    add_header_lib_generator(m_engine, m_engine.generators());
+   install_htmpl(m_engine);
 
    boost::shared_ptr<scanner> c_scaner(new hammer::c_scanner);
    m_engine.scanner_manager().register_scanner(m_engine.get_type_registry().get(types::CPP), c_scaner);
@@ -108,7 +99,8 @@ ProjectManager::ProjectManager()
    m_engine.toolset_manager().add_toolset(auto_ptr<toolset>(new qt_toolset));
 
    m_engine.call_resolver().insert("use-toolset", boost::function<void (project*, pstring&, pstring&, pstring*)>(boost::bind(use_toolset_rule, _1, boost::ref(m_engine), _2, _3, _4)));
-   hammer::location_t user_config_script = get_user_config_location();
+
+   const location_t user_config_script = get_user_config_location();
    if (!user_config_script.empty() && exists(user_config_script))
       m_engine.load_hammer_script(user_config_script);
 
@@ -181,15 +173,44 @@ ProjectManager::openProject(const QString& fileName,
 
     // create environment for instantiation
     feature_set* build_request = m_engine.feature_registry().make_set();
-    feature_set* usage_requirements = m_engine.feature_registry().make_set();
 
+    // lets handle 'toolset' feature in build request
 #if defined(_WIN32)
-    if (build_request->find("toolset") == build_request->end())
-       build_request->join("toolset", "msvc");
+    const string default_toolset_name = "msvc";
 #else
-    if (build_request->find("toolset") == build_request->end())
-       build_request->join("toolset", "gcc");
+    const string default_toolset_name = "gcc";
 #endif
+    auto i_toolset_in_build_request = build_request->find("toolset");
+    try {
+       if (i_toolset_in_build_request == build_request->end()) {
+          const feature_def& toolset_definition = m_engine.feature_registry().get_def("toolset");
+          if (!toolset_definition.is_legal_value(default_toolset_name))
+             throw std::runtime_error("Default toolset is set to '"+ default_toolset_name + "', but either you didn't configure it in user-config.ham or it has failed to autoconfigure");
+
+          const subfeature_def& toolset_version_def = toolset_definition.get_subfeature("version");
+          if (toolset_version_def.legal_values(default_toolset_name).size() == 1)
+             build_request->join("toolset", (default_toolset_name + "-" + *toolset_version_def.legal_values(default_toolset_name).begin()).c_str());
+          else
+             throw std::runtime_error("Default toolset is set to '"+ default_toolset_name + "', but has multiple version configured. You should request specific version to use.");
+       } else {
+          const feature& used_toolset = **i_toolset_in_build_request;
+          if (!used_toolset.find_subfeature("version")) {
+             const subfeature_def& toolset_version_def = used_toolset.definition().get_subfeature("version");
+             if (toolset_version_def.legal_values(used_toolset.value().to_string()).size() > 1)
+                throw std::runtime_error("Toolset is set to '"+ used_toolset.value().to_string() + "', but has multiple version configured. You should request specific version to use.");
+             else {
+                const string toolset = used_toolset.value().to_string();
+                build_request->erase_all("toolset");
+                build_request->join("toolset", (toolset + "-" + *toolset_version_def.legal_values(toolset).begin()).c_str());
+             }
+          }
+       }
+    } catch (const std::exception& e) {
+       Core::MessageManager::write(tr("Failed opening project '%1': %2").arg(QDir::toNativeSeparators(fileName)).arg(e.what()),
+                                   Core::MessageManager::WithFocus);
+
+       return NULL;
+    }
 
     if (build_request->find("variant") == build_request->end())
        build_request->join("variant", "debug");
@@ -200,6 +221,7 @@ ProjectManager::openProject(const QString& fileName,
     // instantiate selected target
     vector<basic_target*> instantiated_targets;
     try {
+       feature_set* usage_requirements = m_engine.feature_registry().make_set();
        target->instantiate(NULL, *build_request, &instantiated_targets, usage_requirements);
     } catch(const std::exception& e) {
        Core::MessageManager::write(tr("Failed opening project '%1': %2").arg(QDir::toNativeSeparators(fileName)).arg(e.what()),
