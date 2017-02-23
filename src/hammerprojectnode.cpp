@@ -28,13 +28,13 @@ static
 std::string
 versioned_name(const hammer::main_target& mt)
 {
-   const std::string& name = mt.name().to_string();
+   const std::string& name = mt.name();
    const feature_set& props = mt.properties();
    auto i = props.find("version");
    if (i == props.end())
       return name;
    else
-      return name + "-" + (**i).value().to_string();
+      return name + "-" + (**i).value();
 }
 
 HammerProjectNode::HammerProjectNode(HammerProject* project, 

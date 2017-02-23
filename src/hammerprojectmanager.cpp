@@ -44,13 +44,13 @@ namespace fs = boost::filesystem;
 namespace hammer{ namespace QtCreator{
 
 static
-void use_toolset_rule(project*, engine& e, pstring& toolset_name, pstring& toolset_version, pstring* toolset_home_)
+void use_toolset_rule(project*, engine& e, string& toolset_name, string& toolset_version, string* toolset_home_)
 {
    location_t toolset_home;
    if (toolset_home_ != NULL)
-      toolset_home = toolset_home_->to_string();
+      toolset_home = *toolset_home_;
 
-   e.toolset_manager().init_toolset(e, toolset_name.to_string(), toolset_version.to_string(), toolset_home_ == NULL ? NULL : &toolset_home);
+   e.toolset_manager().init_toolset(e, toolset_name, toolset_version, toolset_home_ == NULL ? NULL : &toolset_home);
 }
 
 static
@@ -98,7 +98,7 @@ ProjectManager::ProjectManager()
    m_engine.toolset_manager().add_toolset(auto_ptr<toolset>(new gcc_toolset));
    m_engine.toolset_manager().add_toolset(auto_ptr<toolset>(new qt_toolset));
 
-   m_engine.call_resolver().insert("use-toolset", boost::function<void (project*, pstring&, pstring&, pstring*)>(boost::bind(use_toolset_rule, _1, boost::ref(m_engine), _2, _3, _4)));
+   m_engine.call_resolver().insert("use-toolset", boost::function<void (project*, string&, string&, string*)>(boost::bind(use_toolset_rule, _1, boost::ref(m_engine), _2, _3, _4)));
 
    const location_t user_config_script = get_user_config_location();
    if (!user_config_script.empty() && exists(user_config_script))
@@ -196,10 +196,10 @@ ProjectManager::openProject(const QString& fileName,
           const feature& used_toolset = **i_toolset_in_build_request;
           if (!used_toolset.find_subfeature("version")) {
              const subfeature_def& toolset_version_def = used_toolset.definition().get_subfeature("version");
-             if (toolset_version_def.legal_values(used_toolset.value().to_string()).size() > 1)
-                throw std::runtime_error("Toolset is set to '"+ used_toolset.value().to_string() + "', but has multiple version configured. You should request specific version to use.");
+             if (toolset_version_def.legal_values(used_toolset.value()).size() > 1)
+                throw std::runtime_error("Toolset is set to '"+ used_toolset.value() + "', but has multiple version configured. You should request specific version to use.");
              else {
-                const string toolset = used_toolset.value().to_string();
+                const string toolset = used_toolset.value();
                 build_request->erase_all("toolset");
                 build_request->join("toolset", (toolset + "-" + *toolset_version_def.legal_values(toolset).begin()).c_str());
              }

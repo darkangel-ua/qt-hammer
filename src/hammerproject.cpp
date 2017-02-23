@@ -40,7 +40,7 @@ HammerProject::HammerProject(ProjectManager *manager,
    
    QFileInfo fileInfo(QString::fromStdString((m_mainTarget->location() / "hamfile").string()));
 
-   m_projectName = QString::fromStdString(mt->name().to_string());
+   m_projectName = QString::fromStdString(mt->name());
    m_projectFile = new HammerProjectFile(this, fileInfo.absoluteFilePath());
    m_rootNode = new HammerProjectNode(this, m_projectFile);
 }
@@ -170,7 +170,7 @@ QStringList HammerProject::allIncludePaths(const hammer::main_target& mt) const
 
    for(const feature* f : mt.properties()) {
       if (f->name() == "include") {
-         location_t l = f->get_path_data().target_->location() / f->value().to_string();
+         location_t l = f->get_path_data().target_->location() / f->value();
          l.normalize();
          result.append(QString::fromStdString(l.string()));
       }
@@ -184,7 +184,7 @@ QStringList HammerProject::allDefines(const hammer::main_target& mt) const
    QStringList result;
    for(const feature* f : mt.properties()) {
       if (f->name() == "define") {
-         QString v(f->value().to_string().c_str());
+         QString v(f->value().c_str());
          v.replace(QString("="), QString(" "));
          result.append("#define " + v);
       }

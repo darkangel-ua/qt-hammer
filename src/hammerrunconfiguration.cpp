@@ -48,13 +48,13 @@ QString HammerRunConfiguration::executable() const
       for (const build_node_ptr& node : nodes)
          for (const basic_target* bt : node->products_)
             if (bt->type().equal_or_derived_from(types::EXE)) {
-               location_t l = bt->location() / bt->name().to_string();
+               location_t l = bt->location() / bt->name();
                m_executable = QString::fromStdString(l.string());
                return *m_executable;
             } else if (bt->type().equal_or_derived_from(types::TESTING_OUTPUT)) {
                for (const build_node::source_t& src : node->sources_)
                   if (src.source_target_->type().equal_or_derived_from(types::EXE)) {
-                     location_t l = src.source_target_->location() / src.source_target_->name().to_string();
+                     location_t l = src.source_target_->location() / src.source_target_->name();
                      m_executable = QString::fromStdString(l.string());
                      return *m_executable;
                   }
