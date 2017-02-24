@@ -44,9 +44,6 @@ class HammerProjectNode : public HammerNodeBase
       bool addSubProjects(const QStringList &proFilePaths) override;
       bool removeSubProjects(const QStringList &proFilePaths) override;
 
-//      Core::IDocument* projectFile() const;
-//      QString projectFilePath() const;
-
    private:
       typedef QHash<QString, FolderNode *> FolderByName;
 
@@ -63,29 +60,33 @@ class HammerDepProjectNode : public HammerNodeBase
                            const HammerProject& owner);
       ~HammerDepProjectNode();
 
-      virtual bool hasBuildTargets() const { return false; }
+      bool hasBuildTargets() const { return false; }
 
-      virtual bool canAddSubProject(const QString &proFilePath) const { return false; }
+      bool canAddSubProject(const QString &proFilePath) const override { return false; }
 
-      virtual bool addSubProjects(const QStringList &proFilePaths)  { return false; }
-      virtual bool removeSubProjects(const QStringList &proFilePaths)  { return false; }
+      bool addSubProjects(const QStringList &proFilePaths) override { return false; }
+      bool removeSubProjects(const QStringList &proFilePaths) override { return false; }
 
-      virtual bool addFiles(const ProjectExplorer::FileType fileType,
-                          const QStringList &filePaths,
-                          QStringList *notAdded = 0) { return false; }
+      bool addFiles(const QStringList &filePaths,
+                    QStringList *notAdded = 0) override
+      { return false; }
 
-      virtual bool removeFiles(const ProjectExplorer::FileType fileType,
-                             const QStringList &filePaths,
-                             QStringList *notRemoved = 0) { return false; }
-      virtual bool deleteFiles(const ProjectExplorer::FileType fileType,
-                             const QStringList &filePaths) { return false; }
+      bool removeFiles(const QStringList &filePaths,
+                       QStringList *notRemoved = 0) override
+      { return false; }
 
-      virtual bool renameFile(const ProjectExplorer::FileType fileType,
-                             const QString &filePath,
-                             const QString &newFilePath) { return false; }
+      bool deleteFiles(const QStringList &filePaths) override
+      { return false; }
 
-      virtual QList<ProjectExplorer::RunConfiguration *> runConfigurationsFor(Node *node) { return QList<ProjectExplorer::RunConfiguration *>(); }
-      void refresh();
+      bool renameFile(const QString &filePath,
+                      const QString &newFilePath) override
+      { return false; }
+
+      QList<ProjectExplorer::RunConfiguration*>
+      runConfigurations() const override
+      { return QList<ProjectExplorer::RunConfiguration*>(); }
+
+      void refresh() override;
       const HammerProject& owner() const { return owner_; }
       const hammer::main_target& mt() const { return mt_; }
 
@@ -100,27 +101,30 @@ class HammerDepLinkProjectNode : public HammerNodeBase
       HammerDepLinkProjectNode(HammerDepProjectNode& link);
       ~HammerDepLinkProjectNode();
 
-      virtual bool hasBuildTargets() const { return false; }
-      virtual bool canAddSubProject(const QString &proFilePath) const { return false; }
+      bool canAddSubProject(const QString &proFilePath) const override { return false; }
 
-      virtual bool addSubProjects(const QStringList &proFilePaths)  { return false; }
-      virtual bool removeSubProjects(const QStringList &proFilePaths)  { return false; }
+      bool addSubProjects(const QStringList &proFilePaths) override { return false; }
+      bool removeSubProjects(const QStringList &proFilePaths) override { return false; }
 
-      virtual bool addFiles(const ProjectExplorer::FileType fileType,
-                          const QStringList &filePaths,
-                          QStringList *notAdded = 0) { return false; }
+      bool addFiles(const QStringList &filePaths,
+                    QStringList *notAdded = 0) override
+      { return false; }
 
-      virtual bool removeFiles(const ProjectExplorer::FileType fileType,
-                             const QStringList &filePaths,
-                             QStringList *notRemoved = 0) { return false; }
-      virtual bool deleteFiles(const ProjectExplorer::FileType fileType,
-                             const QStringList &filePaths) { return false; }
+      bool removeFiles(const QStringList &filePaths,
+                       QStringList *notRemoved = 0) override
+      { return false; }
 
-      virtual bool renameFile(const ProjectExplorer::FileType fileType,
-                             const QString &filePath,
-                             const QString &newFilePath) { return false; }
+      bool deleteFiles(const QStringList &filePaths) override
+      { return false; }
 
-      virtual QList<ProjectExplorer::RunConfiguration *> runConfigurationsFor(Node *node) { return QList<ProjectExplorer::RunConfiguration *>(); }
+      bool renameFile(const QString &filePath,
+                      const QString &newFilePath) override
+      { return false; }
+
+      QList<ProjectExplorer::RunConfiguration *>
+      runConfigurations() const override
+      { return QList<ProjectExplorer::RunConfiguration *>(); }
+
       void refresh();
       HammerDepProjectNode& link() { return link_; }
 

@@ -77,7 +77,7 @@ class DepsVisitor : public ProjectExplorer::NodesVisitor
    public:
       DepsVisitor(const HammerProject& p) : p_(p) {}
 
-      virtual void visitProjectNode(ProjectExplorer::ProjectNode* node)
+      void visitProjectNode(ProjectExplorer::ProjectNode* node) override
       {
          if (HammerDepProjectNode* d = dynamic_cast<HammerDepProjectNode*>(node))
             if (&d->owner() == &p_)

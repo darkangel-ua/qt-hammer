@@ -23,7 +23,7 @@ class HammerProject : public ProjectExplorer::Project
 
    public:
       HammerProject(ProjectManager *manager, const main_target* mt, bool main_project = false);
-      virtual ~HammerProject();
+      ~HammerProject();
 
       QString displayName() const override;
       Core::IDocument *document() const override;
@@ -39,7 +39,7 @@ class HammerProject : public ProjectExplorer::Project
       void toolChainChanged(ProjectExplorer::ToolChain *);
 
    protected:
-      virtual RestoreResult fromMap(const QVariantMap &map, QString *errorMessage) override;
+      RestoreResult fromMap(const QVariantMap &map, QString *errorMessage) override;
    
    private:
       ProjectManager *m_manager;
@@ -63,7 +63,7 @@ class HammerProjectFile : public Core::IDocument
 
    public:
       HammerProjectFile(HammerProject *parent, QString fileName);
-      virtual ~HammerProjectFile();
+      ~HammerProjectFile();
 
       bool save(QString *errorString, const QString &fileName, bool autoSave) override;
 

@@ -19,7 +19,7 @@ class HammerMakeStep : public ProjectExplorer::AbstractProcessStep
 
    public:
       HammerMakeStep(ProjectExplorer::BuildStepList *parent);
-      virtual ~HammerMakeStep();
+      ~HammerMakeStep();
 
       HammerBuildConfiguration *hammerBuildConfiguration() const;
 
@@ -56,9 +56,9 @@ class HammerMakeCurrentStep : public ProjectExplorer::AbstractProcessStep
       HammerMakeCurrentStep(ProjectExplorer::BuildStepList *parent);
 
       HammerBuildConfiguration *hammerBuildConfiguration() const;
-      virtual bool init();
-      virtual ProjectExplorer::BuildStepConfigWidget *createConfigWidget();
-      virtual bool immutable() const { return false; }
+      bool init() override;
+      ProjectExplorer::BuildStepConfigWidget *createConfigWidget() override;
+      bool immutable() const override { return false; }
       void setTargetToBuid(const QString& target, const QString& projectPath);
 
    protected:
