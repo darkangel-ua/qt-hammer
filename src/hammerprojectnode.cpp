@@ -9,6 +9,7 @@
 #include <hammer/core/feature_set.h>
 #include <hammer/core/feature.h>
 #include <hammer/core/toolsets/qt_toolset.h>
+#include <hammer/core/testing_intermediate_meta_target.h>
 
 #include "hammerprojectnode.h"
 #include "hammerproject.h"
@@ -64,6 +65,9 @@ bool HammerProjectNode::removeSubProjects(const QStringList &proFilePaths)
 
 void HammerProjectNode::addNodes(const basic_target* bt)
 {
+   const bool testing_bt = bt->type().equal_or_derived_from(hammer::types::EXE) &&
+                           dynamic_cast<const testing_intermediate_meta_target*>(bt->get_main_target()->get_meta_target());
+
    if (bt->type().equal_or_derived_from(types::CPP) ||
        bt->type().equal_or_derived_from(types::C))
    {
@@ -98,7 +102,9 @@ void HammerProjectNode::addNodes(const basic_target* bt)
       m_resNode->addFileNodes(QList<ProjectExplorer::FileNode*>() << f);
    } else if (bt->type().equal_or_derived_from(hammer::qt_uic_main) ||
               bt->type().equal_or_derived_from(hammer::types::PCH) ||
-              bt->type().equal_or_derived_from(hammer::types::OBJ))
+              bt->type().equal_or_derived_from(hammer::types::OBJ) ||
+              bt->type().equal_or_derived_from(hammer::types::TESTING_OUTPUT) ||
+              testing_bt)
    {
       BOOST_FOREACH(const basic_target* i, static_cast<const main_target*>(bt)->sources())
         addNodes(i);
