@@ -72,41 +72,12 @@ ProjectExplorer::ProjectNode* HammerProject::rootProjectNode() const
    return m_rootNode;
 }
 
-class DepsVisitor : public ProjectExplorer::NodesVisitor
-{
-   public:
-      DepsVisitor(const HammerProject& p) : p_(p) {}
-
-      void visitProjectNode(ProjectExplorer::ProjectNode* node) override
-      {
-         if (HammerDepProjectNode* d = dynamic_cast<HammerDepProjectNode*>(node))
-            if (&d->owner() == &p_)
-               result_.push_back(d);
-      }
-
-      QList<HammerDepProjectNode*> result_;
-
-   private:
-      const HammerProject& p_;
-
-};
-
 QStringList HammerProject::files(FilesMode fileMode) const
 {
    if (!m_files.isEmpty())
       return m_files;
 
-   DepsVisitor v(*this);
-   rootProjectNode()->accept(&v);
-
-   QList<const hammer::main_target*> mts;
-   mts.push_back(m_mainTarget);
-   foreach(const HammerDepProjectNode* d, v.result_)
-      mts.push_back(&d->mt());
-
-   foreach(const hammer::main_target* mt, mts)
-      m_files += files_impl(*mt, fileMode);
-
+   m_files += files_impl(*m_mainTarget, fileMode);
    m_files += m_projectFile->filePath().toString();
 
    return m_files;
@@ -130,7 +101,7 @@ QStringList HammerProject::files_impl(const hammer::main_target& mt,
 
 void HammerProject::refresh()
 {
-   CppTools::CppModelManager *modelManager = CppTools::CppModelManager::instance();
+   CppTools::CppModelManager* modelManager = CppTools::CppModelManager::instance();
 
    if (modelManager) {
       CppTools::ProjectInfo pinfo = modelManager->projectInfo(this);
@@ -141,27 +112,19 @@ void HammerProject::refresh()
 
       CppTools::ProjectPartBuilder ppBuilder(pinfo);
 
-      DepsVisitor v(*this);
-      rootProjectNode()->accept(&v);
-      QList<const hammer::main_target*> mts;
-      mts.push_back(m_mainTarget);
-      foreach(const HammerDepProjectNode* d, v.result_)
-         mts.push_back(&d->mt());
-
-      foreach(const hammer::main_target* mt, mts) {
-         ppBuilder.setIncludePaths(allIncludePaths(*mt));
-         ppBuilder.setDefines(allDefines(*mt).join("\n").toLocal8Bit());
-         const QList<Core::Id> languages = ppBuilder.createProjectPartsForFiles(files_impl(*mt, AllFiles));
-         for (Core::Id language : languages)
-            setProjectLanguage(language, true);
-      }
+      ppBuilder.setIncludePaths(allIncludePaths(*m_mainTarget));
+      ppBuilder.setDefines(allDefines(*m_mainTarget).join("\n").toLocal8Bit());
+      const QList<Core::Id> languages = ppBuilder.createProjectPartsForFiles(files_impl(*m_mainTarget, AllFiles));
+      for (Core::Id language : languages)
+         setProjectLanguage(language, true);
 
       m_codeModelFuture.cancel();
       pinfo.finish();
       modelManager->updateProjectInfo(pinfo);
-
-      emit fileListChanged();
    }
+
+   emit fileListChanged();
+   m_files.clear();
 }
 
 QStringList HammerProject::allIncludePaths(const hammer::main_target& mt) const

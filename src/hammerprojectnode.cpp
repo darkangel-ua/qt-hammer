@@ -14,15 +14,10 @@
 #include "hammerproject.h"
 #include "hammerprojectmanager.h"
 
-namespace hammer{namespace QtCreator{
+namespace hammer { namespace QtCreator {
 
 void gatherAllMainTargets(boost::unordered_set<const main_target*>& targets,
                           const main_target& targetToInspect);
-
-HammerNodeBase::HammerNodeBase(const Utils::FileName& projectFilePath)
-   : ProjectExplorer::ProjectNode(projectFilePath)
-{
-}
 
 static
 std::string
@@ -39,7 +34,7 @@ versioned_name(const hammer::main_target& mt)
 
 HammerProjectNode::HammerProjectNode(HammerProject* project, 
                                      Core::IDocument* projectFile)
-   : HammerNodeBase(projectFile->filePath()),
+   : ProjectExplorer::ProjectNode(projectFile->filePath()),
      m_project(project),
      m_projectFile(projectFile)
 {
@@ -67,7 +62,7 @@ bool HammerProjectNode::removeSubProjects(const QStringList &proFilePaths)
    return false;
 }
 
-void HammerNodeBase::addNodes(const basic_target* bt)
+void HammerProjectNode::addNodes(const basic_target* bt)
 {
    if (bt->type().equal_or_derived_from(types::CPP) ||
        bt->type().equal_or_derived_from(types::C))
@@ -112,7 +107,13 @@ void HammerNodeBase::addNodes(const basic_target* bt)
 
 void HammerProjectNode::refresh()
 {
-   HammerNodeBase::refresh();
+   removeFileNodes(fileNodes());
+   removeProjectNodes(subProjectNodes());
+   removeFolderNodes(subFolderNodes());
+   m_srcNode = NULL;
+   m_incNode = NULL;
+   m_resNode = NULL;
+   m_formNode = NULL;
 
    m_buildNode = new FolderNode(Utils::FileName::fromString(QString("build")));
    addFolderNodes({m_buildNode});
@@ -122,87 +123,6 @@ void HammerProjectNode::refresh()
 
    BOOST_FOREACH(const basic_target* bt, m_project->get_main_target().sources())
       addNodes(bt);
-
-   boost::unordered_set<const main_target*> mainTargets;
-   gatherAllMainTargets(mainTargets, m_project->get_main_target());
-   QList<ProjectExplorer::ProjectNode*> deps;
-   BOOST_FOREACH(const main_target* mt, mainTargets)
-      if (mt != &m_project->get_main_target() &&
-                !mt->type().equal_or_derived_from(types::SEARCHED_LIB) &&
-                !mt->type().equal_or_derived_from(types::PREBUILT_SHARED_LIB) &&
-                !mt->type().equal_or_derived_from(types::PREBUILT_STATIC_LIB) &&
-                !mt->type().equal_or_derived_from(types::HEADER_LIB) &&
-                !mt->type().equal_or_derived_from(types::PCH) &&
-                !mt->type().equal_or_derived_from(types::OBJ) &&
-                !mt->type().equal_or_derived_from(qt_uic_main))
-      {
-         ProjectExplorer::ProjectNode* d = static_cast<ProjectManager*>(m_project->projectManager())->add_dep(*mt, *m_project);
-         if (d)
-            deps.push_back(d);
-      }
-
-   addProjectNodes(deps);
-}
-//Core::IDocument* HammerProjectNode::projectFile() const
-//{
-//    return m_projectFile;
-//}
-
-//QString HammerProjectNode::projectFilePath() const
-//{
-//   return m_projectFile->filePath();
-//}
-
-void HammerNodeBase::refresh()
-{
-   removeFileNodes(fileNodes());
-   removeProjectNodes(subProjectNodes());
-   removeFolderNodes(subFolderNodes());
-   m_srcNode = NULL;
-   m_incNode = NULL;
-   m_resNode = NULL;
-   m_formNode = NULL;
-}
-
-HammerDepProjectNode::HammerDepProjectNode(const hammer::main_target& mt,
-                                           const HammerProject& owner)
-   : HammerNodeBase(Utils::FileName::fromString(QString::fromStdString((mt.location().string() + "/hammer")))),
-     mt_(mt),
-     owner_(owner)
-{
-   setDisplayName(QString::fromStdString(versioned_name(mt)));
-   refresh();
-}
-
-HammerDepProjectNode::~HammerDepProjectNode()
-{
-
-}
-
-void HammerDepProjectNode::refresh()
-{
-   HammerNodeBase::refresh();
-
-//   m_buildNode = new FolderNode(Utils::FileName::fromString(QString("build")));
-//   addFolderNodes({m_buildNode});
-
-   BOOST_FOREACH(const basic_target* bt, mt_.sources())
-      addNodes(bt);
-}
-
-HammerDepLinkProjectNode::HammerDepLinkProjectNode(HammerDepProjectNode& link)
-   : HammerNodeBase(Utils::FileName::fromString(QString::fromStdString(link.mt().location().string() + "/hammer"))),
-     link_(link)
-{
-   setDisplayName(QString::fromStdString(versioned_name(link_.mt())));
-   refresh();
-}
-
-HammerDepLinkProjectNode::~HammerDepLinkProjectNode()
-{}
-
-void HammerDepLinkProjectNode::refresh()
-{
 }
 
 }}

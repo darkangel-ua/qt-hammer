@@ -4,6 +4,10 @@
 #include <coreplugin/messagemanager.h>
 #include <coreplugin/icore.h>
 
+#include <coreplugin/actionmanager/actioncontainer.h>
+#include <coreplugin/actionmanager/actionmanager.h>
+#include <coreplugin/coreconstants.h>
+
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
 #include <boost/unordered_set.hpp>
@@ -32,6 +36,7 @@
 
 #include <QFileInfo>
 #include <QAction>
+#include <QMessageBox>
 
 #include "hammerprojectmanager.h"
 #include "hammerproject.h"
@@ -81,6 +86,16 @@ get_user_config_location()
 
 ProjectManager::ProjectManager()
 {
+   Core::ActionContainer* project_actions = Core::ActionManager::actionContainer(ProjectExplorer::Constants::M_PROJECTCONTEXT);
+   const Core::Context projectContext(hammer::QtCreator::PROJECTCONTEXT);
+
+   QAction* project_reload_action_ = new QAction(tr("Reload"), this);
+
+   Core::Command* project_reload_command = Core::ActionManager::registerAction(project_reload_action_, "HammerProjectReload", projectContext);
+   project_reload_command->setDefaultKeySequence(QKeySequence(tr("Meta+H,R")));
+   connect(project_reload_action_, &QAction::triggered, [this]{ on_project_reload(); });
+   project_actions->addAction(project_reload_command);
+
    install_warehouse_rules(m_engine.call_resolver(), m_engine);
    types::register_standart_types(m_engine.get_type_registry(), m_engine.feature_registry());
    m_engine.generators().insert(std::auto_ptr<generator>(new copy_generator(m_engine)));
@@ -243,30 +258,12 @@ ProjectManager::openProject(const QString& fileName,
     return mainProject;
 }
 
-ProjectExplorer::ProjectNode*
-ProjectManager::add_dep(const main_target& mt, const HammerProject& owner)
+void ProjectManager::on_project_reload()
 {
-   visible_targets_t::const_iterator vi = visible_targets_.find(&mt);
-   if (vi != visible_targets_.end() && !vi->second)
-      return NULL;
-
-   stored_visible_targets_t::const_iterator svi = stored_visible_targets_.find(mt.location().string());
-   if (svi != stored_visible_targets_.end())
-      visible_targets_.insert(make_pair(&mt, svi->second));
-
-   if (svi != stored_visible_targets_.end() && !svi->second)
-      return NULL;
-
-   deps_t::const_iterator i = deps_.find(&mt);
-   if (i != deps_.end()) {
-      HammerDepLinkProjectNode* result = new HammerDepLinkProjectNode(*i->second);
-      return result;
-   }
-
-   HammerDepProjectNode* result = new HammerDepProjectNode(mt, owner);
-   deps_.insert(make_pair(&mt, result));
-
-   return result;
+   QMessageBox::information(NULL, "Hammer", "Hi. Reloading");
+   ProjectExplorer::Project* p = ProjectExplorer::SessionManager::startupProject();
+   Q_ASSERT(dynamic_cast<HammerProject*>(p));
+   dynamic_cast<HammerProject&>(*p).refresh();
 }
 
 }}
