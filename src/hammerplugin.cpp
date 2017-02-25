@@ -28,8 +28,6 @@ bool HammerPlugin::initialize(const QStringList &arguments,
    addAutoReleasedObject(new hammer::QtCreator::HammerBuildConfigurationFactory);
    addAutoReleasedObject(new hammer::QtCreator::HammerRunConfigurationFactory);
 
-//   connect(core->editorManager(), SIGNAL(currentEditorChanged(Core::IEditor*)), SLOT(currentEditorChanged(Core::IEditor*)));
-
    return true;
 
 }
