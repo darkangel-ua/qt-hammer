@@ -48,17 +48,17 @@ HammerProjectNode::~HammerProjectNode()
 
 }
 
-bool HammerProjectNode::canAddSubProject(const QString &proFilePath) const
+bool HammerProjectNode::canAddSubProject(const QString& proFilePath) const
 {
    return false;
 }
 
-bool HammerProjectNode::addSubProjects(const QStringList &proFilePaths)
+bool HammerProjectNode::addSubProjects(const QStringList& proFilePaths)
 {
    return false;
 }
 
-bool HammerProjectNode::removeSubProjects(const QStringList &proFilePaths)
+bool HammerProjectNode::removeSubProjects(const QStringList& proFilePaths)
 {
    return false;
 }

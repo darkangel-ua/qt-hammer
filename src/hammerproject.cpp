@@ -49,7 +49,7 @@ skip_testing_run_if_any(const main_target& mt)
    return mt;
 }
 
-HammerProject::HammerProject(ProjectManager *manager, 
+HammerProject::HammerProject(ProjectManager* manager,
                              const main_target* mt,
                              bool main_project)
    : m_manager(manager),
@@ -74,27 +74,32 @@ HammerProject::~HammerProject()
    delete m_rootNode;
 }
 
-QString HammerProject::displayName() const
+QString
+HammerProject::displayName() const
 {
    return m_projectName;
 }
 
-Core::IDocument* HammerProject::document() const
+Core::IDocument*
+HammerProject::document() const
 {
    return m_projectFile;
 }
 
-ProjectExplorer::IProjectManager* HammerProject::projectManager() const
+ProjectExplorer::IProjectManager*
+HammerProject::projectManager() const
 {
    return m_manager;
 }
 
-ProjectExplorer::ProjectNode* HammerProject::rootProjectNode() const
+ProjectExplorer::ProjectNode*
+HammerProject::rootProjectNode() const
 {
    return m_rootNode;
 }
 
-QStringList HammerProject::files(FilesMode fileMode) const
+QStringList
+HammerProject::files(FilesMode fileMode) const
 {
    if (!m_files.isEmpty())
       return m_files;
@@ -105,8 +110,9 @@ QStringList HammerProject::files(FilesMode fileMode) const
    return m_files;
 }
 
-QStringList HammerProject::files_impl(const hammer::main_target& mt,
-                                      FilesMode) const
+QStringList
+HammerProject::files_impl(const hammer::main_target& mt,
+                          FilesMode) const
 {
    QStringList result;
 
@@ -157,7 +163,8 @@ void HammerProject::reload(const main_target* mt)
    m_rootNode->refresh();
 }
 
-QStringList HammerProject::allIncludePaths(const hammer::main_target& mt) const
+QStringList
+HammerProject::allIncludePaths(const hammer::main_target& mt) const
 {
    QStringList result;
 
@@ -172,7 +179,8 @@ QStringList HammerProject::allIncludePaths(const hammer::main_target& mt) const
    return result;
 }
 
-QStringList HammerProject::allDefines(const hammer::main_target& mt) const
+QStringList
+HammerProject::allDefines(const hammer::main_target& mt) const
 {
    QStringList result;
    for(const feature* f : skip_testing_run_if_any(mt).properties()) {
@@ -187,13 +195,14 @@ QStringList HammerProject::allDefines(const hammer::main_target& mt) const
 }
 
 ProjectExplorer::Project::RestoreResult
-HammerProject::fromMap(const QVariantMap& map, QString *errorMessage)
+HammerProject::fromMap(const QVariantMap& map,
+                       QString* errorMessage)
 {
    RestoreResult r = Project::fromMap(map, errorMessage);
    if (r != RestoreResult::Ok)
       return r;
 
-   Kit *defaultKit = KitManager::defaultKit();
+   Kit* defaultKit = KitManager::defaultKit();
    if (!activeTarget() && defaultKit)
       addTarget(createTarget(defaultKit));
 
@@ -223,7 +232,9 @@ HammerProjectFile::~HammerProjectFile()
 {
 }
 
-bool HammerProjectFile::save(QString*, const QString&, bool)
+bool HammerProjectFile::save(QString*,
+                             const QString&,
+                             bool)
 {
     return false;
 }
@@ -254,12 +265,15 @@ bool HammerProjectFile::isSaveAsAllowed() const
 }
 
 Core::IDocument::ReloadBehavior
-HammerProjectFile::reloadBehavior(ChangeTrigger, ChangeType) const
+HammerProjectFile::reloadBehavior(ChangeTrigger,
+                                  ChangeType) const
 {
     return BehaviorSilent;
 }
 
-bool HammerProjectFile::reload(QString*, ReloadFlag, ChangeType)
+bool HammerProjectFile::reload(QString*,
+                               ReloadFlag,
+                               ChangeType)
 {
     return true;
 }

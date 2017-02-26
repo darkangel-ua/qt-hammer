@@ -19,18 +19,18 @@
 #include "hammer_make_step_config_widget.h"
 
 namespace {
-   const char * const HAMMER_MS_ID("HammerProjectManager.HammerMakeStep");
-   const char * const HAMMER_MS_DISPLAY_NAME(QT_TRANSLATE_NOOP("HammerProjectManager::Internal::HammerMakeStep", "Hammer"));
-   const char * const HAMMER_MAKE_CURRENT_DISPLAY_NAME(QT_TRANSLATE_NOOP("HammerProjectManager::Internal::HammerMakeCurrentStep", "MakeCurrent"));
+   const char* const HAMMER_MS_ID("HammerProjectManager.HammerMakeStep");
+   const char* const HAMMER_MS_DISPLAY_NAME(QT_TRANSLATE_NOOP("HammerProjectManager::Internal::HammerMakeStep", "Hammer"));
+   const char* const HAMMER_MAKE_CURRENT_DISPLAY_NAME(QT_TRANSLATE_NOOP("HammerProjectManager::Internal::HammerMakeCurrentStep", "MakeCurrent"));
 
-   const char * const MAKE_ARGUMENTS_KEY("HammerProjectManager.HammerMakeStep.MakeArguments");
-   const char * const MAKE_COMMAND_KEY("HammerProjectManager.HammerMakeStep.MakeCommand");
+   const char* const MAKE_ARGUMENTS_KEY("HammerProjectManager.HammerMakeStep.MakeArguments");
+   const char* const MAKE_COMMAND_KEY("HammerProjectManager.HammerMakeStep.MakeCommand");
 }
 
 namespace hammer{ namespace QtCreator{
 
-HammerMakeStep::HammerMakeStep(ProjectExplorer::BuildStepList* parent) :
-AbstractProcessStep(parent, Core::Id(HAMMER_MS_ID))
+HammerMakeStep::HammerMakeStep(ProjectExplorer::BuildStepList* parent)
+   : AbstractProcessStep(parent, Core::Id(HAMMER_MS_ID))
 {
    ctor();
 }
@@ -113,7 +113,8 @@ void HammerMakeStep::run(QFutureInterface<bool> &fi)
    AbstractProcessStep::run(fi);
 }
 
-ProjectExplorer::BuildStepConfigWidget *HammerMakeStep::createConfigWidget()
+ProjectExplorer::BuildStepConfigWidget*
+HammerMakeStep::createConfigWidget()
 {
    return new hammer_make_step_config_widget(this);
 }
@@ -128,13 +129,14 @@ void HammerMakeStep::set_arguments(const QString& args)
    m_makeArguments = args;
 }
 
-HammerMakeCurrentStep::HammerMakeCurrentStep(ProjectExplorer::BuildStepList *parent)
+HammerMakeCurrentStep::HammerMakeCurrentStep(ProjectExplorer::BuildStepList* parent)
    : AbstractProcessStep(parent, Core::Id(HAMMER_MAKE_CURRENT_ID))
 {
 
 }
 
-HammerMakeCurrentStep::HammerMakeCurrentStep(ProjectExplorer::BuildStepList *parent, HammerMakeCurrentStep *bs)
+HammerMakeCurrentStep::HammerMakeCurrentStep(ProjectExplorer::BuildStepList* parent,
+                                             HammerMakeCurrentStep* bs)
    : AbstractProcessStep(parent, bs)
 {
 
@@ -148,10 +150,10 @@ HammerMakeCurrentStep::createConfigWidget()
 
 bool HammerMakeCurrentStep::init()
 {
-   HammerBuildConfiguration *bc = hammerBuildConfiguration();
+   HammerBuildConfiguration* bc = hammerBuildConfiguration();
 
    setEnabled(true);
-   ProjectExplorer::ProcessParameters *pp = processParameters();
+   ProjectExplorer::ProcessParameters* pp = processParameters();
    pp->setMacroExpander(bc->macroExpander());
    pp->setWorkingDirectory(bc->buildDirectory().toString());
    pp->setEnvironment(bc->environment());
@@ -163,18 +165,20 @@ bool HammerMakeCurrentStep::init()
    return AbstractProcessStep::init();
 }
 
-void HammerMakeCurrentStep::setTargetToBuid(const QString& target, const QString& projectPath)
+void HammerMakeCurrentStep::setTargetToBuid(const QString& target,
+                                            const QString& projectPath)
 {
-   ProjectExplorer::ProcessParameters *pp = processParameters();
+   ProjectExplorer::ProcessParameters* pp = processParameters();
    pp->setArguments("--just-one-source \"" + target + "\" --just-one-source-project-path \"" + projectPath + "\"");
 }
 
-HammerBuildConfiguration *HammerMakeCurrentStep::hammerBuildConfiguration() const
+HammerBuildConfiguration*
+HammerMakeCurrentStep::hammerBuildConfiguration() const
 {
-   return static_cast<HammerBuildConfiguration *>(buildConfiguration());
+   return static_cast<HammerBuildConfiguration*>(buildConfiguration());
 }
 
-HammerMakeStepFactory::HammerMakeStepFactory(QObject *parent)
+HammerMakeStepFactory::HammerMakeStepFactory(QObject* parent)
    : ProjectExplorer::IBuildStepFactory(parent)
 {
 }
@@ -183,7 +187,7 @@ HammerMakeStepFactory::~HammerMakeStepFactory()
 {
 }
 
-bool HammerMakeStepFactory::canCreate(ProjectExplorer::BuildStepList *parent,
+bool HammerMakeStepFactory::canCreate(ProjectExplorer::BuildStepList* parent,
                                       Core::Id id) const
 {
    if (parent->target()->project()->id() != Core::Id(HAMMERPROJECT_ID))
@@ -193,8 +197,9 @@ bool HammerMakeStepFactory::canCreate(ProjectExplorer::BuildStepList *parent,
           id == Core::Id(HAMMER_MAKE_CURRENT_ID);
 }
 
-ProjectExplorer::BuildStep *HammerMakeStepFactory::create(ProjectExplorer::BuildStepList *parent,
-                                                          const Core::Id id)
+ProjectExplorer::BuildStep*
+HammerMakeStepFactory::create(ProjectExplorer::BuildStepList* parent,
+                              const Core::Id id)
 {
    if (!canCreate(parent, id))
       return NULL;
@@ -205,14 +210,15 @@ ProjectExplorer::BuildStep *HammerMakeStepFactory::create(ProjectExplorer::Build
       return new HammerMakeStep(parent);
 }
 
-bool HammerMakeStepFactory::canClone(ProjectExplorer::BuildStepList *parent,
-                                     ProjectExplorer::BuildStep *source) const
+bool HammerMakeStepFactory::canClone(ProjectExplorer::BuildStepList* parent,
+                                     ProjectExplorer::BuildStep* source) const
 {
    return canCreate(parent, source->id());
 }
 
-ProjectExplorer::BuildStep *HammerMakeStepFactory::clone(ProjectExplorer::BuildStepList *parent,
-                                                         ProjectExplorer::BuildStep *source)
+ProjectExplorer::BuildStep*
+HammerMakeStepFactory::clone(ProjectExplorer::BuildStepList* parent,
+                             ProjectExplorer::BuildStep* source)
 {
    if (!canClone(parent, source))
       return NULL;
@@ -226,14 +232,15 @@ ProjectExplorer::BuildStep *HammerMakeStepFactory::clone(ProjectExplorer::BuildS
          return NULL;
 }
 
-bool HammerMakeStepFactory::canRestore(ProjectExplorer::BuildStepList *parent,
-                                        const QVariantMap &map) const
+bool HammerMakeStepFactory::canRestore(ProjectExplorer::BuildStepList* parent,
+                                        const QVariantMap& map) const
 {
    return canCreate(parent, ProjectExplorer::idFromMap(map));
 }
 
-ProjectExplorer::BuildStep *HammerMakeStepFactory::restore(ProjectExplorer::BuildStepList *parent,
-                                                           const QVariantMap &map)
+ProjectExplorer::BuildStep*
+HammerMakeStepFactory::restore(ProjectExplorer::BuildStepList* parent,
+                               const QVariantMap& map)
 {
    if (!canRestore(parent, map))
       return NULL;

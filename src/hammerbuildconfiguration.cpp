@@ -2,7 +2,6 @@
 
 #include "hammermakestep.h"
 #include "hammerproject.h"
-//#include "hammertarget.h"
 #include "hammerprojectconstants.h"
 
 #include <projectexplorer/buildsteplist.h>
@@ -58,7 +57,7 @@ QList<ProjectExplorer::BuildInfo*>
 HammerBuildConfigurationFactory::createBuildInfo(const ProjectExplorer::Kit* k,
                                                  const Utils::FileName& buildDir) const
 {
-   QList<ProjectExplorer::BuildInfo *> result;
+   QList<ProjectExplorer::BuildInfo*> result;
 
    ProjectExplorer::BuildInfo* debug_info = new ProjectExplorer::BuildInfo(this);
    debug_info->typeName = tr("Debug");
@@ -97,7 +96,7 @@ HammerBuildConfigurationFactory::availableBuilds(const ProjectExplorer::Target* 
    return createBuildInfo(parent->kit(), parent->project()->projectDirectory());
 }
 
-int HammerBuildConfigurationFactory::priority(const ProjectExplorer::Kit *k,
+int HammerBuildConfigurationFactory::priority(const ProjectExplorer::Kit* k,
                                               const QString &projectPath) const
 {
     Utils::MimeDatabase mdb;

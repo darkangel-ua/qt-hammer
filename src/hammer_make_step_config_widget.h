@@ -36,4 +36,4 @@ class hammer_make_step_config_widget : public ProjectExplorer::BuildStepConfigWi
 
 }}
 
-#endif // HAMMER_MAKE_STEP_CONFIG_WIDGET_H
+#endif

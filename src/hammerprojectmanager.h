@@ -26,8 +26,11 @@ class ProjectManager : public ProjectExplorer::IProjectManager
       ~ProjectManager();
 
       QString mimeType() const override;
-      ProjectExplorer::Project *openProject(const QString& fileName,
-                                            QString *errorString) override;
+
+      ProjectExplorer::Project*
+      openProject(const QString& fileName,
+                  QString* errorString) override;
+
    private:
       QList<HammerProject*> m_projects;
       /// never null;

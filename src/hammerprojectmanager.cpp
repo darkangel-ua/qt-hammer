@@ -50,7 +50,11 @@ namespace fs = boost::filesystem;
 namespace hammer{ namespace QtCreator{
 
 static
-void use_toolset_rule(project*, engine& e, string& toolset_name, string& toolset_version, string* toolset_home_)
+void use_toolset_rule(project*,
+                      engine& e,
+                      string& toolset_name,
+                      string& toolset_version,
+                      string* toolset_home_)
 {
    location_t toolset_home;
    if (toolset_home_ != NULL)

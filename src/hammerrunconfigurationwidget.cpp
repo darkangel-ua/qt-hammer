@@ -22,7 +22,7 @@ using namespace ProjectExplorer;
 
 namespace hammer{ namespace QtCreator{
 
-HammerRunConfigurationWidget::HammerRunConfigurationWidget(HammerRunConfiguration *rc)
+HammerRunConfigurationWidget::HammerRunConfigurationWidget(HammerRunConfiguration* rc)
     : m_ignoreChange(false),
       m_runConfiguration(rc)
 {
@@ -39,11 +39,11 @@ HammerRunConfigurationWidget::HammerRunConfigurationWidget(HammerRunConfiguratio
     m_workingDirectory->setHistoryCompleter(QLatin1String("Qt.WorkingDir.History"));
     m_workingDirectory->setPromptDialogTitle(tr("Select Working Directory"));
 
-    QToolButton *resetButton = new QToolButton();
+    QToolButton* resetButton = new QToolButton();
     resetButton->setToolTip(tr("Reset to Default"));
     resetButton->setIcon(QIcon(QLatin1String(Core::Constants::ICON_RESET)));
 
-    QHBoxLayout *boxlayout = new QHBoxLayout();
+    QHBoxLayout* boxlayout = new QHBoxLayout();
     boxlayout->addWidget(m_workingDirectory);
     boxlayout->addWidget(resetButton);
 
@@ -55,11 +55,11 @@ HammerRunConfigurationWidget::HammerRunConfigurationWidget(HammerRunConfiguratio
     m_detailsContainer->setState(Utils::DetailsWidget::NoSummary);
 //    boxlayout->addWidget(m_detailsContainer);
 
-    QWidget *detailsWidget = new QWidget(m_detailsContainer);
+    QWidget* detailsWidget = new QWidget(m_detailsContainer);
     m_detailsContainer->setWidget(detailsWidget);
     detailsWidget->setLayout(layout);
 
-    QVBoxLayout *vbx = new QVBoxLayout(this);
+    QVBoxLayout* vbx = new QVBoxLayout(this);
     vbx->setMargin(0);
     vbx->addWidget(m_detailsContainer);
 
@@ -98,7 +98,7 @@ void HammerRunConfigurationWidget::resetWorkingDirectory()
 
 void HammerRunConfigurationWidget::environmentWasChanged()
 {
-    EnvironmentAspect *aspect = m_runConfiguration->extraAspect<EnvironmentAspect>();
+    EnvironmentAspect* aspect = m_runConfiguration->extraAspect<EnvironmentAspect>();
     QTC_ASSERT(aspect, return);
     m_workingDirectory->setEnvironment(aspect->environment());
 }

@@ -15,12 +15,14 @@ class HammerRunConfiguration : public ProjectExplorer::LocalApplicationRunConfig
       explicit HammerRunConfiguration(ProjectExplorer::Target* parent);
       QString executable() const override;
 
-      ProjectExplorer::ApplicationLauncher::Mode runMode() const override;
+      ProjectExplorer::ApplicationLauncher::Mode
+      runMode() const override;
+
       QString workingDirectory() const override;
       QString commandLineArguments() const override;
       QWidget* createConfigurationWidget() override;
       bool isConfigured() const override { return true; }
-      ConfigurationState ensureConfigured(QString *errorMessage = 0) override { return Configured; }
+      ConfigurationState ensureConfigured(QString* errorMessage = 0) override { return Configured; }
 
    signals:
        void baseWorkingDirectoryChanged(const QString&);
@@ -46,19 +48,36 @@ class HammerRunConfigurationFactory : public ProjectExplorer::IRunConfigurationF
       Q_OBJECT
    public:
       explicit HammerRunConfigurationFactory(QObject* parent = NULL);
-      QList<Core::Id> availableCreationIds(ProjectExplorer::Target* parent, CreationMode mode = UserCreate) const override;
+
+      QList<Core::Id>
+      availableCreationIds(ProjectExplorer::Target* parent,
+                           CreationMode mode = UserCreate) const override;
+
       QString displayNameForId(Core::Id id) const override;
 
-      bool canCreate(ProjectExplorer::Target* parent, Core::Id id) const override;
-      bool canRestore(ProjectExplorer::Target *parent, const QVariantMap &map) const override;
-      bool canClone(ProjectExplorer::Target *parent, ProjectExplorer::RunConfiguration *source) const override;
-      ProjectExplorer::RunConfiguration *clone(ProjectExplorer::Target *parent, ProjectExplorer::RunConfiguration *source) override;
+      bool canCreate(ProjectExplorer::Target* parent,
+                     Core::Id id) const override;
+
+      bool canRestore(ProjectExplorer::Target* parent,
+                      const QVariantMap &map) const override;
+
+      bool canClone(ProjectExplorer::Target* parent,
+                    ProjectExplorer::RunConfiguration*source) const override;
+
+      ProjectExplorer::RunConfiguration*
+      clone(ProjectExplorer::Target* parent,
+            ProjectExplorer::RunConfiguration* source) override;
 
    private:
-      ProjectExplorer::RunConfiguration* doCreate(ProjectExplorer::Target* parent, Core::Id id) override;
-      ProjectExplorer::RunConfiguration* doRestore(ProjectExplorer::Target* parent, const QVariantMap& map) override;
+      ProjectExplorer::RunConfiguration*
+      doCreate(ProjectExplorer::Target* parent,
+               Core::Id id) override;
+
+      ProjectExplorer::RunConfiguration*
+      doRestore(ProjectExplorer::Target* parent,
+                const QVariantMap& map) override;
 };
 
 }}
 
-#endif //h_5f5d6e1c_be16_4925_829f_765fb4b1374b
+#endif

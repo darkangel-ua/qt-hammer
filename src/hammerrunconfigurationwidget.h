@@ -32,13 +32,13 @@ class HammerRunConfigurationWidget : public QWidget
        void resetWorkingDirectory();
        void environmentWasChanged();
 
-       void workingDirectoryChanged(const QString &workingDirectory);
+       void workingDirectoryChanged(const QString& workingDirectory);
 
    private:
       bool m_ignoreChange;
       HammerRunConfiguration* m_runConfiguration;
-      Utils::PathChooser *m_workingDirectory;
-      Utils::DetailsWidget *m_detailsContainer;
+      Utils::PathChooser* m_workingDirectory;
+      Utils::DetailsWidget* m_detailsContainer;
 };
 
 }}

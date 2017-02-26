@@ -5,9 +5,9 @@
 
 namespace hammer{ namespace QtCreator{
 
-hammer_make_step_config_widget::hammer_make_step_config_widget(HammerMakeStep* make_step) :
-   ui_(new Ui::hammer_make_step_config_widget),
-   make_step_(make_step)
+hammer_make_step_config_widget::hammer_make_step_config_widget(HammerMakeStep* make_step)
+   : ui_(new Ui::hammer_make_step_config_widget),
+     make_step_(make_step)
 {
    ui_->setupUi(this);
    ui_->command_edit_->setText(make_step_->makeCommand());

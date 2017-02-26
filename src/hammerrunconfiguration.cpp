@@ -103,7 +103,8 @@ bool HammerRunConfiguration::fromMap(const QVariantMap &map)
    return ProjectExplorer::LocalApplicationRunConfiguration::fromMap(map);
 }
 
-QVariantMap HammerRunConfiguration::toMap() const
+QVariantMap
+HammerRunConfiguration::toMap() const
 {
    QVariantMap result(ProjectExplorer::LocalApplicationRunConfiguration::toMap());
 
@@ -158,9 +159,9 @@ HammerRunConfiguration::environment() const
 */
 
 // from projectexplorer/projectconfiguration.cpp
-static const char * const CONFIGURATION_ID_KEY("ProjectExplorer.ProjectConfiguration.Id");
+static const char* const CONFIGURATION_ID_KEY("ProjectExplorer.ProjectConfiguration.Id");
 
-HammerRunConfigurationFactory::HammerRunConfigurationFactory(QObject *parent)
+HammerRunConfigurationFactory::HammerRunConfigurationFactory(QObject* parent)
    : ProjectExplorer::IRunConfigurationFactory(parent)
 {
 }
@@ -192,15 +193,15 @@ bool HammerRunConfigurationFactory::canRestore(ProjectExplorer::Target* parent,
    return canCreate(parent, ProjectExplorer::idFromMap(map));
 }
 
-bool HammerRunConfigurationFactory::canClone(ProjectExplorer::Target *parent,
-                                             ProjectExplorer::RunConfiguration *source) const
+bool HammerRunConfigurationFactory::canClone(ProjectExplorer::Target* parent,
+                                             ProjectExplorer::RunConfiguration* source) const
 {
    return canCreate(parent, source->id());
 }
 
 ProjectExplorer::RunConfiguration*
-HammerRunConfigurationFactory::clone(ProjectExplorer::Target *parent,
-                                     ProjectExplorer::RunConfiguration *source)
+HammerRunConfigurationFactory::clone(ProjectExplorer::Target* parent,
+                                     ProjectExplorer::RunConfiguration* source)
 {
    if (!canClone(parent, source))
        return nullptr;

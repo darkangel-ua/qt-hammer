@@ -32,7 +32,7 @@ class HammerProjectNode : public ProjectExplorer::ProjectNode
       void refresh();
 
    private:
-      typedef QHash<QString, FolderNode *> FolderByName;
+      typedef QHash<QString, FolderNode*> FolderByName;
 
       HammerProject* m_project;
       Core::IDocument* m_projectFile;
