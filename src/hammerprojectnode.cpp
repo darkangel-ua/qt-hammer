@@ -1,7 +1,6 @@
 #include <coreplugin/idocument.h>
 #include <QFileInfo>
 
-#include <boost/foreach.hpp>
 #include <boost/unordered_set.hpp>
 #include <hammer/core/main_target.h>
 #include <hammer/core/types.h>
@@ -106,7 +105,7 @@ void HammerProjectNode::addNodes(const basic_target* bt)
               bt->type().equal_or_derived_from(hammer::types::TESTING_OUTPUT) ||
               testing_bt)
    {
-      BOOST_FOREACH(const basic_target* i, static_cast<const main_target*>(bt)->sources())
+      for(const basic_target* i : static_cast<const main_target*>(bt)->sources())
         addNodes(i);
    }
 }
@@ -127,7 +126,7 @@ void HammerProjectNode::refresh()
    ProjectExplorer::FileNode* hamfile_node = new ProjectExplorer::FileNode(m_projectFile->filePath(), ProjectExplorer::ProjectFileType, false);
    m_buildNode->addFileNodes({hamfile_node});
 
-   BOOST_FOREACH(const basic_target* bt, m_project->get_main_target().sources())
+   for(const basic_target* bt : m_project->get_main_target().sources())
       addNodes(bt);
 }
 

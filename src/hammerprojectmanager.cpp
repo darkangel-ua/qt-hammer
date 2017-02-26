@@ -9,7 +9,6 @@
 #include <coreplugin/coreconstants.h>
 
 #include <boost/bind.hpp>
-#include <boost/foreach.hpp>
 #include <boost/unordered_set.hpp>
 #include <boost/filesystem/operations.hpp>
 
@@ -158,10 +157,10 @@ void gatherAllMainTargets(boost::unordered_set<const main_target*>& targets,
 
    targets.insert(&targetToInspect);
 
-   BOOST_FOREACH(const basic_target* bt, targetToInspect.sources())
+   for(const basic_target* bt : targetToInspect.sources())
       gatherAllMainTargets(targets, *bt->get_main_target());
 
-   BOOST_FOREACH(const basic_target* bt, targetToInspect.dependencies())
+   for(const basic_target* bt : targetToInspect.dependencies())
       gatherAllMainTargets(targets, *bt->get_main_target());
 }
 
@@ -257,7 +256,7 @@ ProjectManager::openProject(const QString& fileName,
    if (!QFileInfo(fileName).isFile())
         return NULL;
 
-    foreach (ProjectExplorer::Project *pi, ProjectExplorer::SessionManager::instance()->projects()) {
+    for(ProjectExplorer::Project *pi : ProjectExplorer::SessionManager::instance()->projects()) {
         if (fileName == pi->document()->filePath().toString()) {
             Core::MessageManager::write(tr("Failed opening project '%1': Project already open").arg(QDir::toNativeSeparators(fileName)),
                                         Core::MessageManager::WithFocus);

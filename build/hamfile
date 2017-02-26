@@ -13,7 +13,6 @@ lib hammerplugin
     ../src/hammerproject.qrc
     hammerplugin.moc
     /hammer/core
-    /boost/foreach/<version>1.58.0+1
     /boost/serialization/<version>1.58.0+1
     /qtcreator/<version>3.6.0
     /Qt
