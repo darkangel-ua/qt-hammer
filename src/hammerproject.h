@@ -34,6 +34,8 @@ class HammerProject : public ProjectExplorer::Project
       const main_target& get_main_target() const { return *m_mainTarget; }
       bool is_main_project() const { return main_project_; }
       void refresh();
+      // Will replace m_mainTarget on new one and then refresh
+      void reload(const main_target* mt);
    
    signals:
       void toolChainChanged(ProjectExplorer::ToolChain *);

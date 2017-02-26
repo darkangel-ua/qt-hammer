@@ -29,6 +29,7 @@ class HammerProjectNode : public ProjectExplorer::ProjectNode
       bool canAddSubProject(const QString &proFilePath) const override;
       bool addSubProjects(const QStringList &proFilePaths) override;
       bool removeSubProjects(const QStringList &proFilePaths) override;
+      void refresh();
 
    private:
       typedef QHash<QString, FolderNode *> FolderByName;
@@ -43,7 +44,6 @@ class HammerProjectNode : public ProjectExplorer::ProjectNode
       FolderNode* m_buildNode = nullptr;
 
       void addNodes(const basic_target* bt);
-      void refresh();
 };
 
 }}

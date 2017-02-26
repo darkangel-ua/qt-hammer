@@ -7,6 +7,12 @@
 
 class QAction;
 
+namespace hammer {
+
+class engine;
+
+}
+
 namespace hammer{ namespace QtCreator{
 
 class HammerProject;
@@ -24,11 +30,12 @@ class ProjectManager : public ProjectExplorer::IProjectManager
                                             QString *errorString) override;
    private:
       QList<HammerProject*> m_projects;
-      engine m_engine;
+      /// never null;
+      std::unique_ptr<engine> engine_;
 
-      QAction* project_reload_action_;
+      QAction* reload_action_;
 
-      void on_project_reload();
+      void on_reload();
 };
 
 }}

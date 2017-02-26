@@ -14,6 +14,8 @@
 #include <hammer/core/feature.h>
 #include <hammer/core/types.h>
 #include <hammer/core/target_type.h>
+#include <hammer/core/testing_meta_target.h>
+#include <hammer/core/testing_intermediate_meta_target.h>
 
 #include "hammerprojectmanager.h"
 #include "hammerproject.h"
@@ -26,6 +28,26 @@ using ProjectExplorer::KitManager;
 using ProjectExplorer::Target;
 
 namespace hammer{ namespace QtCreator{
+
+static
+const main_target&
+skip_testing_run_if_any(const main_target& mt)
+{
+   const testing_meta_target* tmt = dynamic_cast<const testing_meta_target*>(mt.get_meta_target());
+
+   if (!tmt)
+      return mt;
+
+   for (const basic_target* bt : mt.sources()) {
+      if (bt->type().equal_or_derived_from(types::EXE) &&
+          dynamic_cast<const testing_intermediate_meta_target*>(bt->get_meta_target()))
+      {
+         return *static_cast<const main_target*>(bt);
+      }
+   }
+
+   return mt;
+}
 
 HammerProject::HammerProject(ProjectManager *manager, 
                              const main_target* mt,
@@ -88,7 +110,7 @@ QStringList HammerProject::files_impl(const hammer::main_target& mt,
 {
    QStringList result;
 
-   for(const basic_target* bt : mt.sources()) {
+   for(const basic_target* bt : skip_testing_run_if_any(mt).sources()) {
       if (bt->type().equal_or_derived_from(types::CPP) ||
           bt->type().equal_or_derived_from(types::C))
       {
@@ -111,7 +133,6 @@ void HammerProject::refresh()
       //FIXME: End
 
       CppTools::ProjectPartBuilder ppBuilder(pinfo);
-
       ppBuilder.setIncludePaths(allIncludePaths(*m_mainTarget));
       ppBuilder.setDefines(allDefines(*m_mainTarget).join("\n").toLocal8Bit());
       const QList<Core::Id> languages = ppBuilder.createProjectPartsForFiles(files_impl(*m_mainTarget, AllFiles));
@@ -123,15 +144,24 @@ void HammerProject::refresh()
       modelManager->updateProjectInfo(pinfo);
    }
 
-   emit fileListChanged();
    m_files.clear();
+   emit fileListChanged();
+}
+
+void HammerProject::reload(const main_target* mt)
+{
+   Q_ASSERT(mt);
+   m_mainTarget = mt;
+
+   refresh();
+   m_rootNode->refresh();
 }
 
 QStringList HammerProject::allIncludePaths(const hammer::main_target& mt) const
 {
    QStringList result;
 
-   for(const feature* f : mt.properties()) {
+   for(const feature* f : skip_testing_run_if_any(mt).properties()) {
       if (f->name() == "include") {
          location_t l = f->get_path_data().target_->location() / f->value();
          l.normalize();
@@ -145,7 +175,7 @@ QStringList HammerProject::allIncludePaths(const hammer::main_target& mt) const
 QStringList HammerProject::allDefines(const hammer::main_target& mt) const
 {
    QStringList result;
-   for(const feature* f : mt.properties()) {
+   for(const feature* f : skip_testing_run_if_any(mt).properties()) {
       if (f->name() == "define") {
          QString v(f->value().c_str());
          v.replace(QString("="), QString(" "));
