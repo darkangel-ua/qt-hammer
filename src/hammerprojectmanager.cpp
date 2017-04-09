@@ -18,6 +18,7 @@
 #include <hammer/core/toolsets/qt_toolset.h>
 #include <hammer/core/htmpl/htmpl.h>
 #include <hammer/core/warehouse.h>
+#include <hammer/core/warehouse_target.h>
 #include <hammer/core/types.h>
 #include <hammer/core/generator_registry.h>
 #include <hammer/core/copy_generator.h>
@@ -32,6 +33,7 @@
 #include <hammer/core/fs_helpers.h>
 #include <hammer/core/feature.h>
 #include <hammer/core/subfeature.h>
+#include <hammer/core/warehouse.h>
 
 #include <QFileInfo>
 #include <QAction>
@@ -42,6 +44,7 @@
 #include "hammerproject.h"
 #include "hammerprojectnode.h"
 #include "hammerprojectconstants.h"
+#include "download_packages_dialog.h"
 
 using namespace std;
 namespace fs = boost::filesystem;
@@ -66,6 +69,10 @@ static
 hammer::location_t
 get_user_config_location()
 {
+   const char* user_provided_user_config_path = getenv("HAMMER_USER_CONFIG");
+   if (user_provided_user_config_path)
+      return hammer::location_t(user_provided_user_config_path);
+
 #if defined(_WIN32)
    const char* home_path = getenv("USERPROFILE");
    if (home_path != NULL)
@@ -249,51 +256,94 @@ load_project(hammer::engine& e,
    return instantiate_project(e, newly_loaded_hammer_project);
 }
 
+struct ProjectManager::cloned_state
+{
+   std::unique_ptr<engine> engine_ = construct_default_engine();
+   vector<pair<HammerProject*, const hammer::main_target*> > projects_data_;
+};
+
+ProjectManager::cloned_state
+clone_current_state()
+{
+   const auto all_projects = ProjectExplorer::SessionManager::projects();
+
+   ProjectManager::cloned_state cloned_state;
+   for (ProjectExplorer::Project* p : all_projects) {
+      if (HammerProject* hammer_project = dynamic_cast<HammerProject*>(p)) {
+         const Utils::FileName& hamfile_path = hammer_project->document()->filePath();
+         const hammer::main_target& mt = load_project(*cloned_state.engine_, hamfile_path.toString().toStdString());
+         cloned_state.projects_data_.push_back({hammer_project, &mt});
+      }
+   }
+
+   return cloned_state;
+}
+
 ProjectExplorer::Project*
 ProjectManager::openProject(const QString& fileName,
                             QString* errorString)
 {
    if (!QFileInfo(fileName).isFile())
-        return NULL;
+      return NULL;
 
-    for(ProjectExplorer::Project *pi : ProjectExplorer::SessionManager::instance()->projects()) {
-        if (fileName == pi->document()->filePath().toString()) {
-            Core::MessageManager::write(tr("Failed opening project '%1': Project already open").arg(QDir::toNativeSeparators(fileName)),
-                                        Core::MessageManager::WithFocus);
+   for(ProjectExplorer::Project *pi : ProjectExplorer::SessionManager::instance()->projects()) {
+      if (fileName == pi->document()->filePath().toString()) {
+         Core::MessageManager::write(tr("Failed opening project '%1': Project already open").arg(QDir::toNativeSeparators(fileName)),
+                                     Core::MessageManager::WithFocus);
+         return NULL;
+      }
+   }
+
+   try {
+      cloned_state cloned_state = clone_current_state();
+      const hammer::main_target& mt = load_project(*cloned_state.engine_, fileName.toStdString());
+
+      warehouse& wh = cloned_state.engine_->warehouse();
+      const auto unresolved_targets = find_all_warehouse_unresolved_targets({const_cast<main_target*>(&mt)});
+      if (!unresolved_targets.empty()) {
+         vector<warehouse::package_info> packages = wh.get_unresoved_targets_info(*cloned_state.engine_, unresolved_targets);
+         sort(packages.begin(), packages.end(), [](const warehouse::package_info& lhs, const warehouse::package_info& rhs) { return lhs.name_ < rhs.name_; });
+         download_packages_dialog dlg(NULL, *cloned_state.engine_, packages);
+         if (dlg.exec() != QDialog::Accepted)
             return NULL;
-        }
-    }
+         else {
+            // because we just added new warehouse targets we need to reload everything + this new project
+            // we need to use new engine because upper cloned_state contains warehouse traps
+            ProjectManager::cloned_state cloned_state = clone_current_state();
+            const hammer::main_target& mt = load_project(*cloned_state.engine_, fileName.toStdString());
+            HammerProject* mainProject = new HammerProject(this, &mt, /*main_project=*/true);
 
-    try {
-       const hammer::main_target& mt = load_project(*engine_, fileName.toStdString());
-       HammerProject* mainProject = new HammerProject(this, &mt, /*main_project=*/true);
+            // I hope this will not throw otherwise bad things happens...
+            reload(std::move(cloned_state));
 
-       return mainProject;
-    } catch (const std::exception& e) {
-       Core::MessageManager::write(tr("Failed open project '%1': %2").arg(QDir::toNativeSeparators(fileName)).arg(e.what()),
-                                   Core::MessageManager::WithFocus);
-       return NULL;
-    }
+            return mainProject;
+         }
+      } else {
+         // at this point we sure that we can load project without errors and unresolved warehouse targets
+         // except cases when some UFO modified hamfiles in-between :(
+         const hammer::main_target& mt = load_project(*engine_, fileName.toStdString());
+         HammerProject* mainProject = new HammerProject(this, &mt, /*main_project=*/true);
+
+         return mainProject;
+      }
+   } catch (const std::exception& e) {
+      Core::MessageManager::write(tr("Failed open project '%1': %2").arg(QDir::toNativeSeparators(fileName)).arg(e.what()),
+                                  Core::MessageManager::WithFocus);
+      return NULL;
+   }
 }
 
 void ProjectManager::on_reload()
 {
-   const auto all_projects = ProjectExplorer::SessionManager::projects();
+   reload(clone_current_state());
+}
 
-   std::unique_ptr<engine> new_engine = construct_default_engine();
-   vector<pair<HammerProject*, const hammer::main_target*> > reloaded_data;
-   for (ProjectExplorer::Project* p : all_projects) {
-      if (HammerProject* hammer_project = dynamic_cast<HammerProject*>(p)) {
-         const Utils::FileName& hamfile_path = hammer_project->document()->filePath();
-         const hammer::main_target& mt = load_project(*new_engine, hamfile_path.toString().toStdString());
-         reloaded_data.push_back({hammer_project, &mt});
-      }
-   }
-
-   for (const auto& p : reloaded_data)
+void ProjectManager::reload(cloned_state state)
+{
+   for (const auto& p : state.projects_data_)
       p.first->reload(p.second);
 
-   std::swap(engine_, new_engine);
+   std::swap(engine_, state.engine_);
 }
 
 }}

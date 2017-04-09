@@ -14,6 +14,7 @@ lib hammerplugin
     hammerplugin.moc
     /hammer/core
     /boost/serialization/<version>1.58.0+1
+    /boost/format/<version>1.58.0+1
     /qtcreator/<version>3.6.0
     /Qt
   :
@@ -36,5 +37,6 @@ qt.moc hammerplugin.moc
     ../src/hammerrunconfiguration.h
     ../src/hammerrunconfigurationwidget.h
     ../src/hammer_make_step_config_widget.h
+    ../src/download_packages_dialog.h
    ;
 explicit hammerplugin.moc ;

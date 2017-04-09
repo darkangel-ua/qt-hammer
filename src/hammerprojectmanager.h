@@ -22,6 +22,8 @@ class ProjectManager : public ProjectExplorer::IProjectManager
       Q_OBJECT
 
    public:
+      struct cloned_state;
+
       ProjectManager();
       ~ProjectManager();
 
@@ -39,6 +41,7 @@ class ProjectManager : public ProjectExplorer::IProjectManager
       QAction* reload_action_;
 
       void on_reload();
+      void reload(cloned_state state);
 };
 
 }}
