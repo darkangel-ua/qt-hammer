@@ -78,7 +78,7 @@ HammerBuildConfigurationFactory::createBuildInfo(const ProjectExplorer::Kit* k,
    profile_info->displayName = tr("Profile");
    profile_info->buildDirectory = buildDir;
    profile_info->kitId = k->id();
-   profile_info->buildType = BuildConfiguration::Release;
+   profile_info->buildType = BuildConfiguration::Profile;
 
    result << debug_info << release_info << profile_info;
 
