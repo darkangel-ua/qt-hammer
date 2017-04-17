@@ -37,31 +37,42 @@ HammerRunConfiguration::HammerRunConfiguration(ProjectExplorer::Target* parent,
 {
 }
 
-QString HammerRunConfiguration::executable() const
+static
+QString find_executable(const hammer::main_target& mt)
 {
-   if (m_executable)
-      return *m_executable;
-
-   const main_target& mt = qobject_cast<HammerProject*>(m_target->project())->get_main_target();
    try {
       build_nodes_t nodes = mt.generate();
       for (const build_node_ptr& node : nodes)
          for (const basic_target* bt : node->products_)
             if (bt->type().equal_or_derived_from(types::EXE)) {
                location_t l = bt->location() / bt->name();
-               m_executable = QString::fromStdString(l.string());
-               return *m_executable;
+               return QString::fromStdString(l.string());
             } else if (bt->type().equal_or_derived_from(types::TESTING_OUTPUT)) {
                for (const build_node::source_t& src : node->sources_)
                   if (src.source_target_->type().equal_or_derived_from(types::EXE)) {
                      location_t l = src.source_target_->location() / src.source_target_->name();
-                     m_executable = QString::fromStdString(l.string());
-                     return *m_executable;
+                     return QString::fromStdString(l.string());
                   }
             }
    } catch(...) { }
 
    return QString();
+}
+
+QString HammerRunConfiguration::executable() const
+{
+   if (m_executable)
+      return *m_executable;
+
+   const main_target& mt = qobject_cast<HammerProject*>(m_target->project())->get_main_target();
+
+   const QString r = find_executable(mt);
+   if (r.isEmpty())
+      return r;
+
+   m_executable = r;
+
+   return *m_executable;
 }
 
 ProjectExplorer::ApplicationLauncher::Mode
@@ -184,7 +195,8 @@ QString HammerRunConfigurationFactory::displayNameForId(Core::Id id) const
 bool HammerRunConfigurationFactory::canCreate(ProjectExplorer::Target* parent,
                                               Core::Id id) const
 {
-   return qobject_cast<HammerProject*>(parent->project()) && id == Core::Id(HAMMER_RUN_CONFIGURATION_ID);
+   HammerProject* p = qobject_cast<HammerProject*>(parent->project());
+   return p && id == Core::Id(HAMMER_RUN_CONFIGURATION_ID) && !find_executable(p->get_main_target()).isEmpty();
 }
 
 bool HammerRunConfigurationFactory::canRestore(ProjectExplorer::Target* parent,
