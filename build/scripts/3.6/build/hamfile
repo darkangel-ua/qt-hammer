@@ -1,4 +1,6 @@
-project qtcreator : requirements
+#pragma parser v2
+
+project qtcreator : requirements =
                       <version>3.6.0
                       @<include>../src/libs
                   ;
@@ -58,6 +60,7 @@ prebuilt-lib Qt.QtCreator.ProjectExplorer
   @<include>../src/plugins
  ;
 
+explicit
 prebuilt-lib Qt.QtCreator.TextEditor
  : 
  :
@@ -65,5 +68,3 @@ prebuilt-lib Qt.QtCreator.TextEditor
  :
   @<include>../src/plugins
  ;
-
-explicit Qt.QtCreator.TextEditor ;

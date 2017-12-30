@@ -1,1 +1,3 @@
-copy work : ../build : <destination>./ <type-to-copy>SHARED_LIB ;
+#pragma parser v2
+
+copy work : ../build : <destination>./. <type-to-copy>SHARED_LIB ;

@@ -1,4 +1,6 @@
-project qt-hammer : requirements <toolset>gcc:<cxxflags>"--std=c++11" ;
+#pragma parser v2
+
+project qt-hammer : requirements = (<toolset>gcc -> <cxxflags>"--std=c++11") ;
  
 feature.feature all-static : on : propagated composite no-defaults;
 feature.compose <all-static>on : <link>static;
@@ -18,14 +20,15 @@ lib hammerplugin
     /qtcreator/<version>3.6.0
     /Qt
   :
-    <search>"../../../../Qt/5.5/gcc_64/lib"
+    <search>../../../../Qt/5.5/gcc_64/lib
     <pic>on
 #    <host-os>windows,<variant>debug:<name>HammerPlugind.dll
 #    <host-os>windows,<variant>release:<name>HammerPlugin.dll
-    <host-os>linux,<variant>debug:<name>libHammerd.so
-    <host-os>linux,<variant>release:<name>libHammer.so
+    (<host-os>linux && <variant>debug -> <name>libHammerd.so)
+    (<host-os>linux && <variant>release -> <name>libHammer.so)
   ;
 
+explicit
 qt.moc hammerplugin.moc 
    : 
     ../src/hammerplugin.h 
@@ -39,4 +42,3 @@ qt.moc hammerplugin.moc
     ../src/hammer_make_step_config_widget.h
     ../src/download_packages_dialog.h
    ;
-explicit hammerplugin.moc ;
