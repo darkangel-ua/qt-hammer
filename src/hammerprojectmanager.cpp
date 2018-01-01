@@ -87,7 +87,7 @@ construct_default_engine()
 {
    std::unique_ptr<engine> default_engine(new engine);
 
-   install_warehouse_rules(default_engine->call_resolver(), *default_engine);
+   install_warehouse_rules(*default_engine);
    types::register_standart_types(default_engine->get_type_registry(), default_engine->feature_registry());
    default_engine->generators().insert(std::auto_ptr<generator>(new copy_generator(*default_engine)));
    default_engine->generators().insert(std::auto_ptr<generator>(new obj_generator(*default_engine)));
