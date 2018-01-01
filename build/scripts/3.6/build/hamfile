@@ -1,5 +1,3 @@
-#pragma parser v2
-
 project qtcreator : requirements =
                       <version>3.6.0
                       @<include>../src/libs
