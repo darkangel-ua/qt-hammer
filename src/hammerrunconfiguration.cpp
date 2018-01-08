@@ -7,6 +7,7 @@
 #include <hammer/core/target_type.h>
 #include <hammer/core/types.h>
 #include <hammer/core/engine.h>
+#include <hammer/core/basic_build_target.h>
 
 #include "hammerrunconfiguration.h"
 #include "hammerrunconfigurationwidget.h"
@@ -43,7 +44,7 @@ QString find_executable(const hammer::main_target& mt)
    try {
       build_nodes_t nodes = mt.generate();
       for (const build_node_ptr& node : nodes)
-         for (const basic_target* bt : node->products_)
+         for (const basic_build_target* bt : node->products_)
             if (bt->type().equal_or_derived_from(types::EXE)) {
                location_t l = bt->location() / bt->name();
                return QString::fromStdString(l.string());
