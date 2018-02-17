@@ -99,8 +99,7 @@ void HammerProjectNode::addNodes(const basic_target* bt)
          addFolderNodes({m_resNode});
       }
       m_resNode->addFileNodes(QList<ProjectExplorer::FileNode*>() << f);
-   } else if (bt->type().equal_or_derived_from(hammer::qt_uic_main) ||
-              bt->type().equal_or_derived_from(hammer::types::PCH) ||
+   } else if (bt->type().equal_or_derived_from(hammer::types::PCH) ||
               bt->type().equal_or_derived_from(hammer::types::OBJ) ||
               bt->type().equal_or_derived_from(hammer::types::TESTING_OUTPUT) ||
               testing_bt)

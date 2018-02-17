@@ -209,7 +209,7 @@ instantiate_project(hammer::engine& e,
       build_request->join("variant", "debug");
 
    if (build_request->find("host-os") == build_request->end())
-      build_request->join("host-os", e.feature_registry().get_def("host-os").get_default().c_str());
+      build_request->join("host-os", e.feature_registry().get_def("host-os").get_defaults().front().value_.c_str());
 
    // instantiate selected target
    vector<basic_target*> instantiated_targets;
