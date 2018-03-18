@@ -100,9 +100,9 @@ construct_default_engine()
    default_engine->scanner_manager().register_scanner(default_engine->get_type_registry().get(types::C), c_scaner);
    default_engine->scanner_manager().register_scanner(default_engine->get_type_registry().get(types::RC), c_scaner);
 
-   default_engine->toolset_manager().add_toolset(auto_ptr<toolset>(new msvc_toolset));
-   default_engine->toolset_manager().add_toolset(auto_ptr<toolset>(new gcc_toolset));
-   default_engine->toolset_manager().add_toolset(auto_ptr<toolset>(new qt_toolset));
+   default_engine->toolset_manager().add_toolset(*default_engine, auto_ptr<toolset>(new msvc_toolset));
+   default_engine->toolset_manager().add_toolset(*default_engine, auto_ptr<toolset>(new gcc_toolset));
+   default_engine->toolset_manager().add_toolset(*default_engine, auto_ptr<toolset>(new qt_toolset));
 
    const location_t user_config_script = get_user_config_location();
    if (!user_config_script.empty() && exists(user_config_script))
@@ -210,6 +210,9 @@ instantiate_project(hammer::engine& e,
 
    if (build_request->find("host-os") == build_request->end())
       build_request->join("host-os", e.feature_registry().get_def("host-os").get_defaults().front().value_.c_str());
+
+   if (build_request->find("target-os") == build_request->end())
+      build_request->join("target-os", e.feature_registry().get_def("target-os").get_defaults().front().value_.c_str());
 
    // instantiate selected target
    vector<basic_target*> instantiated_targets;
