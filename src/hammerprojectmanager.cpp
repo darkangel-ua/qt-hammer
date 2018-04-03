@@ -21,7 +21,6 @@
 #include <hammer/core/warehouse_target.h>
 #include <hammer/core/types.h>
 #include <hammer/core/generator_registry.h>
-#include <hammer/core/copy_generator.h>
 #include <hammer/core/obj_generator.h>
 #include <hammer/core/testing_generators.h>
 #include <hammer/core/header_lib_generator.h>
@@ -89,7 +88,6 @@ construct_default_engine()
 
    install_warehouse_rules(*default_engine);
    types::register_standart_types(default_engine->get_type_registry(), default_engine->feature_registry());
-   default_engine->generators().insert(std::auto_ptr<generator>(new copy_generator(*default_engine)));
    default_engine->generators().insert(std::auto_ptr<generator>(new obj_generator(*default_engine)));
    add_testing_generators(*default_engine, default_engine->generators());
    add_header_lib_generator(*default_engine, default_engine->generators());
