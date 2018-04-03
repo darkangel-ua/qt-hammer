@@ -1,1 +1,5 @@
-copy work : ../build : <destination>./. <type-to-copy>SHARED_LIB ;
+copy work 
+   : sources = ../build 
+   : destination = ./.
+   : types = SHARED_LIB 
+   ;
