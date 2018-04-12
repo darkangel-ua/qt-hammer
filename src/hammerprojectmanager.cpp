@@ -165,7 +165,7 @@ instantiate_project(hammer::engine& e,
          if (target != NULL)
             throw std::runtime_error("Project contains more than one implicit target");
          else
-            target = i->second;
+            target = i->second.get();
       }
    }
 
