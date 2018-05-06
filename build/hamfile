@@ -1,9 +1,9 @@
 project qt-hammer : requirements = (<toolset>gcc -> <cxxflags>"--std=c++11") ;
  
-feature.feature all-static : on : propagated composite no-defaults;
+feature all-static : on : propagated composite no-defaults;
 feature.compose <all-static>on : <link>static;
 
-feature.feature pic : on : propagated composite no-defaults;
+feature pic : on : propagated composite no-defaults;
 feature.compose <pic>on : <cxxflags>"-fPIC" <cflags>"-fPIC";
 
 lib hammerplugin 
