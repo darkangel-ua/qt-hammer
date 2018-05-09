@@ -1,4 +1,7 @@
-project qt-hammer : requirements = (<toolset>gcc -> <cxxflags>"--std=c++11") ;
+project qt-hammer
+   : requirements =
+      (<toolset>gcc -> <cxxflags>"--std=c++11")
+   ;
  
 feature all-static : on : propagated composite no-defaults;
 feature.compose <all-static>on : <link>static;
@@ -7,36 +10,37 @@ feature pic : on : propagated composite no-defaults;
 feature.compose <pic>on : <cxxflags>"-fPIC" <cflags>"-fPIC";
 
 lib hammerplugin 
-  : [ glob ../src/*.cpp ]
-    [ glob ../src/*.h ]
-    [ qt.uic [ glob ../src/*.ui ] ]
-    ../src/hammerproject.qrc
-    hammerplugin.moc
-    /hammer/core
-    /boost/serialization/<version>1.58.0+1
-    /boost/format/<version>1.58.0+1
-    /qtcreator/<version>3.6.0
-    /Qt
-  :
-    <search>../../../../Qt/5.5/gcc_64/lib
-    <pic>on
-#    <host-os>windows,<variant>debug:<name>HammerPlugind.dll
-#    <host-os>windows,<variant>release:<name>HammerPlugin.dll
-    (<host-os>linux && <variant>debug -> <name>libHammerd.so)
-    (<host-os>linux && <variant>release -> <name>libHammer.so)
-  ;
+   : sources =
+      [ glob ../src/*.cpp ]
+      [ glob ../src/*.h ]
+      [ qt.uic [ glob ../src/*.ui ] ]
+      ../src/hammerproject.qrc
+      hammerplugin.moc
+      /hammer/core
+      /boost/serialization/<version>1.58.0+1
+      /boost/format/<version>1.58.0+1
+      /qtcreator/<version>3.6.0
+      /Qt
+   : requirements =
+      <search>../../../../Qt/5.5/gcc_64/lib
+      <pic>on
+#      <host-os>windows,<variant>debug:<name>HammerPlugind.dll
+#      <host-os>windows,<variant>release:<name>HammerPlugin.dll
+      (<host-os>linux && <variant>debug -> <name>libHammerd.so)
+      (<host-os>linux && <variant>release -> <name>libHammer.so)
+   ;
 
 explicit
 qt.moc hammerplugin.moc 
-   : 
-    ../src/hammerplugin.h 
-    ../src/hammerprojectmanager.h
-    ../src/hammerproject.h
-#    ../src/hammerprojectnode.h
-    ../src/hammermakestep.h
-    ../src/hammerbuildconfiguration.h
-    ../src/hammerrunconfiguration.h
-    ../src/hammerrunconfigurationwidget.h
-    ../src/hammer_make_step_config_widget.h
-    ../src/download_packages_dialog.h
+   : sources =
+      ../src/hammerplugin.h
+      ../src/hammerprojectmanager.h
+      ../src/hammerproject.h
+#      ../src/hammerprojectnode.h
+      ../src/hammermakestep.h
+      ../src/hammerbuildconfiguration.h
+      ../src/hammerrunconfiguration.h
+      ../src/hammerrunconfigurationwidget.h
+      ../src/hammer_make_step_config_widget.h
+      ../src/download_packages_dialog.h
    ;
