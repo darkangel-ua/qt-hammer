@@ -170,7 +170,7 @@ HammerProject::allIncludePaths(const hammer::main_target& mt) const
 
    for(const feature* f : skip_testing_run_if_any(mt).properties()) {
       if (f->name() == "include") {
-         location_t l = f->get_path_data().target_->location() / f->value();
+         location_t l = f->get_path_data().project_->location() / f->value();
          l.normalize();
          result.append(QString::fromStdString(l.string()));
       }
