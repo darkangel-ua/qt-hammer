@@ -1,24 +1,21 @@
-#if !defined(h_51aa0b54_a286_48db_9fa4_f0b7328e74c2)
-#define h_51aa0b54_a286_48db_9fa4_f0b7328e74c2
-
+#pragma once
 #include <projectexplorer/project.h>
 #include <projectexplorer/toolchain.h>
 #include <projectexplorer/buildstep.h>
 #include <coreplugin/idocument.h>
 #include <QtCore/QFuture>
 
-namespace ProjectExplorer{ class IProjectManager; }
-namespace hammer{ class main_target; }
+namespace ProjectExplorer { class IProjectManager; }
+namespace hammer { class main_target; }
 
-namespace hammer{ namespace QtCreator{
+namespace hammer { namespace QtCreator{
 
 class ProjectManager;
 class HammerProjectFile;
 class HammerProjectNode;
 class HammerBuildConfiguration;
 
-class HammerProject : public ProjectExplorer::Project
-{
+class HammerProject : public ProjectExplorer::Project {
       Q_OBJECT
 
    public:
@@ -63,8 +60,7 @@ class HammerProject : public ProjectExplorer::Project
                              FilesMode) const;
 };
 
-class HammerProjectFile : public Core::IDocument
-{
+class HammerProjectFile : public Core::IDocument {
     Q_OBJECT
 
    public:
@@ -97,5 +93,3 @@ class HammerProjectFile : public Core::IDocument
 };
 
 }}
-
-#endif

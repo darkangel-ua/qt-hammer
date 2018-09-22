@@ -1,7 +1,6 @@
-#if !defined(h_5f935913_a0a8_44d2_a1d2_a4ec11379b43)
-#define h_5f935913_a0a8_44d2_a1d2_a4ec11379b43
+#pragma once
 
-namespace hammer{ namespace QtCreator{
+namespace hammer { namespace QtCreator {
 
 const char* const PROJECTCONTEXT = "HammerProject.ProjectContext";
 const char* const HAMMERMIMETYPE  = "text/x-hammer";
@@ -20,5 +19,3 @@ const char* const HAMMER_BC_ID("HammerProjectManager.HammerBuildConfiguration");
 const char* const HAMMER_BC_BUILD_CURRENT_LIST_ID("HammerProjectManager.HammerBuildConfiguration");
 
 }}
-
-#endif

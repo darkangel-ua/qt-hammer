@@ -1,18 +1,17 @@
-#ifndef DOWNLOAD_PACKAGES_DIALOG_H
-#define DOWNLOAD_PACKAGES_DIALOG_H
-
+#pragma once
 #include <QDialog>
 #include <QThread>
 #include <hammer/core/warehouse.h>
 
 namespace Ui {
+
 class download_packages_dialog;
+
 }
 
 class QStandardItemModel;
 
-class download_packages_dialog : public QDialog
-{
+class download_packages_dialog : public QDialog {
       Q_OBJECT
 
    public:
@@ -70,5 +69,3 @@ class download_packages_dialog::download_thread : public QThread,
       void on_install_end(const std::size_t index,
                           const hammer::warehouse::package_info& package) override;
 };
-
-#endif

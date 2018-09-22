@@ -1,24 +1,25 @@
-#if !defined(h_7a123cb7_7fc3_4180_ae0c_6c4d3c626198)
-#define h_7a123cb7_7fc3_4180_ae0c_6c4d3c626198
-
+#pragma once
 #include <projectexplorer/buildconfiguration.h>
 #include <projectexplorer/abi.h>
 #include <projectexplorer/namedwidget.h>
 
 namespace Utils {
+
 class PathChooser;
+
 }
 
 namespace ProjectExplorer {
+
 class ToolChain;
+
 }
 
-namespace hammer{ namespace QtCreator{
+namespace hammer { namespace QtCreator {
 
 class HammerBuildConfigurationFactory;
 
-class HammerBuildConfiguration : public ProjectExplorer::BuildConfiguration
-{
+class HammerBuildConfiguration : public ProjectExplorer::BuildConfiguration {
       Q_OBJECT
       friend class HammerBuildConfigurationFactory;
    
@@ -36,8 +37,7 @@ class HammerBuildConfiguration : public ProjectExplorer::BuildConfiguration
       BuildType build_type_ = BuildType::Debug;
 };
 
-class HammerBuildConfigurationFactory : public ProjectExplorer::IBuildConfigurationFactory
-{
+class HammerBuildConfigurationFactory : public ProjectExplorer::IBuildConfigurationFactory {
       Q_OBJECT
 
    public:
@@ -83,5 +83,3 @@ class HammerBuildConfigurationFactory : public ProjectExplorer::IBuildConfigurat
 };
 
 }} 
-
-#endif

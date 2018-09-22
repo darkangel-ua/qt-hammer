@@ -1,13 +1,10 @@
-#if !defined(h_5f5d6e1c_be16_4925_829f_765fb4b1374b)
-#define h_5f5d6e1c_be16_4925_829f_765fb4b1374b
-
+#pragma once
 #include <projectexplorer/localapplicationrunconfiguration.h>
 #include <boost/optional.hpp>
 
-namespace hammer{ namespace QtCreator{
+namespace hammer { namespace QtCreator {
 
-class HammerRunConfiguration : public ProjectExplorer::LocalApplicationRunConfiguration
-{
+class HammerRunConfiguration : public ProjectExplorer::LocalApplicationRunConfiguration {
       Q_OBJECT
       friend class HammerRunConfigurationFactory;
       friend class HammerRunConfigurationWidget;
@@ -43,8 +40,7 @@ class HammerRunConfiguration : public ProjectExplorer::LocalApplicationRunConfig
       QString baseWorkingDirectory() const;
 };
 
-class HammerRunConfigurationFactory : public ProjectExplorer::IRunConfigurationFactory
-{
+class HammerRunConfigurationFactory : public ProjectExplorer::IRunConfigurationFactory {
       Q_OBJECT
    public:
       explicit HammerRunConfigurationFactory(QObject* parent = NULL);
@@ -79,5 +75,3 @@ class HammerRunConfigurationFactory : public ProjectExplorer::IRunConfigurationF
 };
 
 }}
-
-#endif

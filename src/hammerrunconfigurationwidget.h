@@ -1,6 +1,4 @@
-#ifndef HAMMERRUNCONFIGURATIONWIDGET_H
-#define HAMMERRUNCONFIGURATIONWIDGET_H
-
+#pragma once
 #include <QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -12,16 +10,17 @@ class QAbstractButton;
 QT_END_NAMESPACE
 
 namespace Utils {
+
 class DetailsWidget;
 class PathChooser;
+
 }
 
-namespace hammer{ namespace QtCreator{
+namespace hammer { namespace QtCreator {
 
 class HammerRunConfiguration;
 
-class HammerRunConfigurationWidget : public QWidget
-{
+class HammerRunConfigurationWidget : public QWidget {
       Q_OBJECT
 
    public:
@@ -42,5 +41,3 @@ class HammerRunConfigurationWidget : public QWidget
 };
 
 }}
-
-#endif

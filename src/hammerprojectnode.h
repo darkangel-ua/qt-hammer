@@ -1,10 +1,10 @@
-#if !defined(h_e94fdb51_b369_4d9f_b686_5a6db23a9466)
-#define h_e94fdb51_b369_4d9f_b686_5a6db23a9466
-
+#pragma once
 #include <projectexplorer/projectnodes.h>
 
 namespace Core {
-   class IDocument;
+
+class IDocument;
+
 }
 
 namespace hammer {
@@ -16,11 +16,9 @@ class main_target;
 
 namespace hammer { namespace QtCreator {
 
-
 class HammerProject;
 
-class HammerProjectNode : public ProjectExplorer::ProjectNode
-{
+class HammerProjectNode : public ProjectExplorer::ProjectNode {
    public:
       HammerProjectNode(HammerProject* project,
                         Core::IDocument* projectFile);
@@ -47,5 +45,3 @@ class HammerProjectNode : public ProjectExplorer::ProjectNode
 };
 
 }}
-
-#endif

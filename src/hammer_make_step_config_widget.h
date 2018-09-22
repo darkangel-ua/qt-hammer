@@ -1,19 +1,18 @@
-#ifndef HAMMER_MAKE_STEP_CONFIG_WIDGET_H
-#define HAMMER_MAKE_STEP_CONFIG_WIDGET_H
-
+#pragma once
 #include <QWidget>
 #include <projectexplorer/buildstep.h>
 
 namespace Ui {
-   class hammer_make_step_config_widget;
+
+class hammer_make_step_config_widget;
+
 }
 
-namespace hammer{ namespace QtCreator{
+namespace hammer { namespace QtCreator {
 
 class HammerMakeStep;
 
-class hammer_make_step_config_widget : public ProjectExplorer::BuildStepConfigWidget
-{
+class hammer_make_step_config_widget : public ProjectExplorer::BuildStepConfigWidget {
       Q_OBJECT
 
    public:
@@ -35,5 +34,3 @@ class hammer_make_step_config_widget : public ProjectExplorer::BuildStepConfigWi
 };
 
 }}
-
-#endif

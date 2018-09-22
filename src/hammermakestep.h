@@ -1,18 +1,15 @@
-#if !defined(h_2d3dca1c_c0f1_4607_b14f_ba5806df07cc)
-#define h_2d3dca1c_c0f1_4607_b14f_ba5806df07cc
-
+#pragma once
 #include <projectexplorer/abstractprocessstep.h>
 
 class QListWidgetItem;
 
-namespace hammer{ namespace QtCreator{
+namespace hammer { namespace QtCreator {
 
 class HammerBuildConfiguration;
 class hammer_make_step_config_widget;
 class HammerMakeStepFactory;
 
-class HammerMakeStep : public ProjectExplorer::AbstractProcessStep
-{
+class HammerMakeStep : public ProjectExplorer::AbstractProcessStep {
       Q_OBJECT
       friend class hammer_make_step_config_widget;
       friend class HammerMakeStepFactory;
@@ -46,8 +43,7 @@ class HammerMakeStep : public ProjectExplorer::AbstractProcessStep
       QString m_makeCommand;
 };
 
-class HammerMakeCurrentStep : public ProjectExplorer::AbstractProcessStep
-{
+class HammerMakeCurrentStep : public ProjectExplorer::AbstractProcessStep {
       Q_OBJECT
 //      friend class HammerMakeStepConfigWidget; // TODO remove again?
       friend class HammerMakeStepFactory;
@@ -75,8 +71,7 @@ class HammerMakeCurrentStep : public ProjectExplorer::AbstractProcessStep
       QString m_targetToBuild;
 };
 
-class HammerMakeStepFactory : public ProjectExplorer::IBuildStepFactory
-{
+class HammerMakeStepFactory : public ProjectExplorer::IBuildStepFactory {
       Q_OBJECT
    public:
       explicit HammerMakeStepFactory(QObject* parent = 0);
@@ -110,5 +105,3 @@ class HammerMakeStepFactory : public ProjectExplorer::IBuildStepFactory
 };
 
 }}
-
-#endif //h_2d3dca1c_c0f1_4607_b14f_ba5806df07cc

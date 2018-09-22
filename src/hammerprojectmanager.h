@@ -1,6 +1,4 @@
-#if !defined(h_a1cc270b_d0ff_4867_ad78_41400c859475)
-#define h_a1cc270b_d0ff_4867_ad78_41400c859475
-
+#pragma once
 #include <projectexplorer/iprojectmanager.h>
 #include <projectexplorer/projectnodes.h>
 #include <hammer/core/engine.h>
@@ -13,12 +11,11 @@ class engine;
 
 }
 
-namespace hammer{ namespace QtCreator{
+namespace hammer { namespace QtCreator {
 
 class HammerProject;
 
-class ProjectManager : public ProjectExplorer::IProjectManager
-{
+class ProjectManager : public ProjectExplorer::IProjectManager {
       Q_OBJECT
 
    public:
@@ -45,5 +42,3 @@ class ProjectManager : public ProjectExplorer::IProjectManager
 };
 
 }}
-
-#endif
