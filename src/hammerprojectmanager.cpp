@@ -33,6 +33,7 @@
 #include <hammer/core/feature.h>
 #include <hammer/core/subfeature.h>
 #include <hammer/core/warehouse.h>
+#include <hammer/core/warehouse_manager.h>
 
 #include <QFileInfo>
 #include <QAction>
@@ -280,7 +281,7 @@ ProjectManager::openProject(const QString& fileName,
       cloned_state cloned_state = clone_current_state();
       const hammer::main_target& mt = load_project(*cloned_state.engine_, fileName.toStdString());
 
-      warehouse& wh = cloned_state.engine_->warehouse();
+      warehouse& wh = *cloned_state.engine_->warehouse_manager().get_default();
       const auto unresolved_targets = find_all_warehouse_unresolved_targets({const_cast<main_target*>(&mt)});
       if (!unresolved_targets.empty()) {
          vector<warehouse::package_info> packages = wh.get_unresoved_targets_info(*cloned_state.engine_, unresolved_targets);

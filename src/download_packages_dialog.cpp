@@ -4,6 +4,7 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include <hammer/core/engine.h>
+#include <hammer/core/warehouse_manager.h>
 #include <boost/format.hpp>
 
 using namespace std;
@@ -103,7 +104,7 @@ void download_packages_dialog::reject()
 void download_packages_dialog::download_thread::run()
 {
    try {
-      owner_.engine_.warehouse().download_and_install(owner_.engine_, owner_.packages_to_download_, *this);
+      owner_.engine_.warehouse_manager().get_default()->download_and_install(owner_.engine_, owner_.packages_to_download_, *this);
    } catch (const std::exception& e) {
       emit error_happened(e.what());
    }
