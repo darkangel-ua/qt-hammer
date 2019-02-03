@@ -34,6 +34,7 @@
 #include <hammer/core/subfeature.h>
 #include <hammer/core/warehouse.h>
 #include <hammer/core/warehouse_manager.h>
+#include <hammer/core/instantiation_context.h>
 
 #include <QFileInfo>
 #include <QAction>
@@ -162,7 +163,7 @@ instantiate_project(hammer::engine& e,
    // find out which target to build
    const basic_meta_target* target = NULL;
    for (hammer::project::targets_t::const_iterator i = p.targets().begin(), last = p.targets().end(); i != last; ++i) {
-      if (!i->second->is_explicit()) {
+      if (!i->second->is_explicit() && !i->second->is_local()) {
          if (target != NULL)
             throw std::runtime_error("Project contains more than one implicit target");
          else
@@ -213,7 +214,8 @@ instantiate_project(hammer::engine& e,
    // instantiate selected target
    vector<basic_target*> instantiated_targets;
    feature_set* usage_requirements = e.feature_registry().make_set();
-   target->instantiate(NULL, *build_request, &instantiated_targets, usage_requirements);
+   instantiation_context ctx;
+   target->instantiate(ctx, nullptr, *build_request, &instantiated_targets, usage_requirements);
 
    if (instantiated_targets.size() != 1)
       throw std::runtime_error("Target instantiation produce more than one result");
