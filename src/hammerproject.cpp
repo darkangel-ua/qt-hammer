@@ -14,7 +14,7 @@
 #include <hammer/core/feature.h>
 #include <hammer/core/types.h>
 #include <hammer/core/target_type.h>
-#include <hammer/core/testing_meta_target.h>
+#include <hammer/core/testing_run_meta_target.h>
 #include <hammer/core/testing_intermediate_meta_target.h>
 
 #include "hammerprojectmanager.h"
@@ -33,7 +33,7 @@ static
 const main_target&
 skip_testing_run_if_any(const main_target& mt)
 {
-   const testing_meta_target* tmt = dynamic_cast<const testing_meta_target*>(mt.get_meta_target());
+   const testing_run_meta_target* tmt = dynamic_cast<const testing_run_meta_target*>(mt.get_meta_target());
 
    if (!tmt)
       return mt;
