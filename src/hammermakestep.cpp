@@ -145,7 +145,7 @@ HammerMakeCurrentStep::HammerMakeCurrentStep(ProjectExplorer::BuildStepList* par
 ProjectExplorer::BuildStepConfigWidget*
 HammerMakeCurrentStep::createConfigWidget()
 {
-   return NULL;
+   return nullptr;
 }
 
 bool HammerMakeCurrentStep::init()
@@ -202,7 +202,7 @@ HammerMakeStepFactory::create(ProjectExplorer::BuildStepList* parent,
                               const Core::Id id)
 {
    if (!canCreate(parent, id))
-      return NULL;
+      return nullptr;
 
    if (id == Core::Id(HAMMER_MAKE_CURRENT_ID))
       return new HammerMakeCurrentStep(parent);
@@ -221,7 +221,7 @@ HammerMakeStepFactory::clone(ProjectExplorer::BuildStepList* parent,
                              ProjectExplorer::BuildStep* source)
 {
    if (!canClone(parent, source))
-      return NULL;
+      return nullptr;
 
    if (HammerMakeStep* old = qobject_cast<HammerMakeStep*>(source))
       return new HammerMakeStep(parent, old);
@@ -229,7 +229,7 @@ HammerMakeStepFactory::clone(ProjectExplorer::BuildStepList* parent,
       if (HammerMakeCurrentStep* old = qobject_cast<HammerMakeCurrentStep*>(source))
          return new HammerMakeCurrentStep(parent, old);
       else
-         return NULL;
+         return nullptr;
 }
 
 bool HammerMakeStepFactory::canRestore(ProjectExplorer::BuildStepList* parent,
@@ -243,17 +243,17 @@ HammerMakeStepFactory::restore(ProjectExplorer::BuildStepList* parent,
                                const QVariantMap& map)
 {
    if (!canRestore(parent, map))
-      return NULL;
+      return nullptr;
 
    ProjectExplorer::BuildStep* bs = create(parent, ProjectExplorer::idFromMap(map));
    if (!bs)
-      return NULL;
+      return nullptr;
 
    if (bs->fromMap(map))
       return bs;
 
    delete bs;
-   return NULL;
+   return nullptr;
 }
 
 QList<Core::Id>

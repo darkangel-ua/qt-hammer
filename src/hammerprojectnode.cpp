@@ -114,10 +114,10 @@ void HammerProjectNode::refresh()
    removeFileNodes(fileNodes());
    removeProjectNodes(subProjectNodes());
    removeFolderNodes(subFolderNodes());
-   m_srcNode = NULL;
-   m_incNode = NULL;
-   m_resNode = NULL;
-   m_formNode = NULL;
+   m_srcNode = nullptr;
+   m_incNode = nullptr;
+   m_resNode = nullptr;
+   m_formNode = nullptr;
 
    m_buildNode = new FolderNode(Utils::FileName::fromString(QString("build")));
    addFolderNodes({m_buildNode});

@@ -62,7 +62,7 @@ get_user_config_location()
 
 #if defined(_WIN32)
    const char* home_path = getenv("USERPROFILE");
-   if (home_path != NULL)
+   if (home_path)
       return hammer::location_t(home_path) / "user-config.ham";
    else
       throw std::runtime_error("Can't find user home directory.");
@@ -71,7 +71,7 @@ get_user_config_location()
 #   if defined(__linux__)
 
    const char* home_path = getenv("HOME");
-   if (home_path != NULL)
+   if (home_path)
       return hammer::location_t(home_path) / "user-config.ham";
    else
       throw std::runtime_error("Can't find user home directory.");
@@ -161,10 +161,10 @@ instantiate_project(hammer::engine& e,
                     const hammer::project& p)
 {
    // find out which target to build
-   const basic_meta_target* target = NULL;
+   const basic_meta_target* target = nullptr;
    for (hammer::project::targets_t::const_iterator i = p.targets().begin(), last = p.targets().end(); i != last; ++i) {
       if (!i->second->is_explicit() && !i->second->is_local()) {
-         if (target != NULL)
+         if (target)
             throw std::runtime_error("Project contains more than one implicit target");
          else
             target = i->second.get();
@@ -269,13 +269,13 @@ ProjectManager::openProject(const QString& fileName,
                             QString* errorString)
 {
    if (!QFileInfo(fileName).isFile())
-      return NULL;
+      return nullptr;
 
    for(ProjectExplorer::Project *pi : ProjectExplorer::SessionManager::instance()->projects()) {
       if (fileName == pi->document()->filePath().toString()) {
          Core::MessageManager::write(tr("Failed opening project '%1': Project already open").arg(QDir::toNativeSeparators(fileName)),
                                      Core::MessageManager::WithFocus);
-         return NULL;
+         return nullptr;
       }
    }
 
@@ -288,9 +288,9 @@ ProjectManager::openProject(const QString& fileName,
       if (!unresolved_targets.empty()) {
          vector<warehouse::package_info> packages = wh.get_unresoved_targets_info(*cloned_state.engine_, unresolved_targets);
          sort(packages.begin(), packages.end(), [](const warehouse::package_info& lhs, const warehouse::package_info& rhs) { return lhs.name_ < rhs.name_; });
-         download_packages_dialog dlg(NULL, *cloned_state.engine_, packages);
+         download_packages_dialog dlg(nullptr, *cloned_state.engine_, packages);
          if (dlg.exec() != QDialog::Accepted)
-            return NULL;
+            return nullptr;
          else {
             // because we just added new warehouse targets we need to reload everything + this new project
             // we need to use new engine because upper cloned_state contains warehouse traps
@@ -314,7 +314,7 @@ ProjectManager::openProject(const QString& fileName,
    } catch (const std::exception& e) {
       Core::MessageManager::write(tr("Failed open project '%1': %2").arg(QDir::toNativeSeparators(fileName)).arg(e.what()),
                                   Core::MessageManager::WithFocus);
-      return NULL;
+      return nullptr;
    }
 }
 
