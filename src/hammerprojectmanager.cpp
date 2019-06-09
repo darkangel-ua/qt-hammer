@@ -90,19 +90,19 @@ construct_default_engine()
 
    install_warehouse_rules(*default_engine);
    types::register_standart_types(default_engine->get_type_registry(), default_engine->feature_registry());
-   default_engine->generators().insert(std::auto_ptr<generator>(new obj_generator(*default_engine)));
+   default_engine->generators().insert(std::unique_ptr<generator>(new obj_generator(*default_engine)));
    add_testing_generators(*default_engine, default_engine->generators());
    add_header_lib_generator(*default_engine, default_engine->generators());
    install_htmpl(*default_engine);
 
-   boost::shared_ptr<scanner> c_scaner(new hammer::c_scanner);
+   auto c_scaner = std::make_shared<hammer::c_scanner>();
    default_engine->scanner_manager().register_scanner(default_engine->get_type_registry().get(types::CPP), c_scaner);
    default_engine->scanner_manager().register_scanner(default_engine->get_type_registry().get(types::C), c_scaner);
    default_engine->scanner_manager().register_scanner(default_engine->get_type_registry().get(types::RC), c_scaner);
 
-   default_engine->toolset_manager().add_toolset(*default_engine, auto_ptr<toolset>(new msvc_toolset));
-   default_engine->toolset_manager().add_toolset(*default_engine, auto_ptr<toolset>(new gcc_toolset));
-   default_engine->toolset_manager().add_toolset(*default_engine, auto_ptr<toolset>(new qt_toolset));
+   default_engine->toolset_manager().add_toolset(*default_engine, unique_ptr<toolset>(new msvc_toolset));
+   default_engine->toolset_manager().add_toolset(*default_engine, unique_ptr<toolset>(new gcc_toolset));
+   default_engine->toolset_manager().add_toolset(*default_engine, unique_ptr<toolset>(new qt_toolset));
 
    const location_t user_config_script = get_user_config_location();
    if (!user_config_script.empty() && exists(user_config_script))
