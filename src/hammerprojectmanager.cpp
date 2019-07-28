@@ -230,7 +230,7 @@ load_project(hammer::engine& e,
 {
    const QString q_hamfile_path = QDir::toNativeSeparators(QString::fromStdString(hamfile_path));
    const hammer::location_t project_dir = resolve_symlinks(hamfile_path).branch_path();
-   const hammer::project& newly_loaded_hammer_project = [&]() -> hammer::project& {
+   const hammer::project& newly_loaded_hammer_project = [&]() -> const hammer::project& {
       try {
          return e.load_project(project_dir);
       } catch (const std::exception& e) {
