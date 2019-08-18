@@ -6,9 +6,6 @@ project qt-hammer
 feature all-static : on : propagated composite no-defaults;
 feature.compose <all-static>on : <link>static;
 
-feature pic : on : propagated composite no-defaults;
-feature.compose <pic>on : <cxxflags>"-fPIC" <cflags>"-fPIC";
-
 lib hammerplugin 
    : sources =
       [ glob ../src/*.cpp ]
