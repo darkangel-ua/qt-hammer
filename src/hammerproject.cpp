@@ -168,7 +168,7 @@ HammerProject::allIncludePaths(const hammer::main_target& mt) const
 {
    QStringList result;
 
-   for(const feature* f : skip_testing_run_if_any(mt).properties()) {
+   for (feature_ref f : skip_testing_run_if_any(mt).properties()) {
       if (f->name() == "include") {
          location_t l = f->get_path_data().project_->location() / f->value();
          l.normalize();
@@ -183,7 +183,7 @@ QStringList
 HammerProject::allDefines(const hammer::main_target& mt) const
 {
    QStringList result;
-   for(const feature* f : skip_testing_run_if_any(mt).properties()) {
+   for (feature_ref f : skip_testing_run_if_any(mt).properties()) {
       if (f->name() == "define") {
          QString v(f->value().c_str());
          v.replace(QString("="), QString(" "));
