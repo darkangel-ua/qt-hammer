@@ -35,6 +35,7 @@
 #include <hammer/core/warehouse.h>
 #include <hammer/core/warehouse_manager.h>
 #include <hammer/core/instantiation_context.h>
+#include <hammer/core/system_paths.h>
 
 #include <QFileInfo>
 #include <QAction>
@@ -51,36 +52,6 @@ using namespace std;
 namespace fs = boost::filesystem;
 
 namespace hammer{ namespace QtCreator{
-
-static
-hammer::location_t
-get_user_config_location()
-{
-   const char* user_provided_user_config_path = getenv("HAMMER_USER_CONFIG");
-   if (user_provided_user_config_path)
-      return hammer::location_t(user_provided_user_config_path);
-
-#if defined(_WIN32)
-   const char* home_path = getenv("USERPROFILE");
-   if (home_path)
-      return hammer::location_t(home_path) / "user-config.ham";
-   else
-      throw std::runtime_error("Can't find user home directory.");
-
-#else
-#   if defined(__linux__)
-
-   const char* home_path = getenv("HOME");
-   if (home_path)
-      return hammer::location_t(home_path) / "user-config.ham";
-   else
-      throw std::runtime_error("Can't find user home directory.");
-
-#   else
-#      error "Platform not supported"
-#   endif
-#endif
-}
 
 static
 std::unique_ptr<engine>
@@ -104,7 +75,7 @@ construct_default_engine()
    default_engine->toolset_manager().add_toolset(*default_engine, unique_ptr<toolset>(new gcc_toolset));
    default_engine->toolset_manager().add_toolset(*default_engine, unique_ptr<toolset>(new qt_toolset));
 
-   const location_t user_config_script = get_user_config_location();
+   const location_t user_config_script = get_system_paths().config_file_;
    if (!user_config_script.empty() && exists(user_config_script))
       default_engine->load_hammer_script(user_config_script);
 
