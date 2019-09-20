@@ -1,6 +1,8 @@
 project qt-hammer
    : requirements =
       (<toolset>gcc -> <cxxflags>"--std=c++11")
+   : dependencies =
+      { /boost/** : 1.67.0 }
    ;
  
 feature all-static : on : propagated composite no-defaults;
@@ -14,8 +16,8 @@ lib hammerplugin
       ../src/hammerproject.qrc
       hammerplugin.moc
       /hammer/core
-      /boost/serialization/<version>1.58.0+1
-      /boost/format/<version>1.58.0+1
+      /boost/serialization
+      /boost/format
       /qtcreator/<version>3.6.0
       /Qt
    : requirements =
